@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axiosService from '@/Services/Axios';
 import { getAllCart } from '@/Store/Slice/AllCartSlice';
+import { getAllMark } from '@/Store/Slice/GetAllBookMark';
 
 const BookPage = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const BookPage = () => {
   const { data: allBooks = [], loading } = bookState;
 const userState=useSelector(state=>state?.user);
 const {data:user}=userState;
+const markState=useSelector(state=>state?.bookmarks);
+const {data:marks}=markState;
   // State management
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,10 +41,10 @@ const {data:user}=userState;
 
   // Extract filter options from actual data
   const filterOptions = {
-    genres: [...new Set(allBooks.map(book => book.genre))].filter(Boolean),
-    languages: [...new Set(allBooks.map(book => book.language))].filter(Boolean),
-    formats: [...new Set(allBooks.map(book => book.format))].filter(Boolean),
-    publishers: [...new Set(allBooks.map(book => book.publisher))].filter(Boolean),
+    genres: [...new Set(allBooks?.map(book => book.genre))].filter(Boolean),
+    languages: [...new Set(allBooks?.map(book => book.language))].filter(Boolean),
+    formats: [...new Set(allBooks?.map(book => book.format))].filter(Boolean),
+    publishers: [...new Set(allBooks?.map(book => book.publisher))].filter(Boolean),
     categories: [
       { value: 'all', label: 'All Books' },
       { value: 'onSale', label: 'On Sale' }
@@ -77,7 +80,7 @@ const {data:user}=userState;
 
   // Apply filters
   useEffect(() => {
-    let filtered = [...allBooks];
+    let filtered = [...allBooks||[]];
 
     // Search filter
     if (searchTerm) {
@@ -236,12 +239,19 @@ const {data:user}=userState;
   }
   const handleBookMark=async(data)=>{
     try{
-      const finalData={userId:user?.userId,bookId:data?.bookId};
-      const response=await axiosService.post('/api/whitelist/addBookMark',finalData);
-      console.log(response);
-      if(response?.status===200){
-        // dispatch(getAllCart());
-        alert(response?.data?.message);
+
+      const userMarks=marks?.find(item=>item?.userId===user?.userId&&item?.book?.bookId===data?.bookId);
+      if(userMarks){
+          alert("Book Already bookmarked");
+      }
+      else{
+        const finalData={userId:user?.userId,bookId:data?.bookId};
+        const response=await axiosService.post('/api/whitelist/addBookMark',finalData);
+        // console.log(response);
+        if(response?.status===200){
+          dispatch(getAllMark());
+          alert(response?.data?.message);
+        }
       }
 
     }

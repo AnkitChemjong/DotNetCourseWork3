@@ -20,5 +20,6 @@ public class Whitelist
 
         // Navigation
         public Users? User { get; set; }
+        [InverseProperty("WhiteLists")]
         public Books? Book { get; set; }
 }

@@ -15,6 +15,7 @@ import AdminDashboard from './Pages/AdminDashboard';
 import { getAllBook } from './Store/Slice/AllBookSlice';
 import { getAllCart } from './Store/Slice/AllCartSlice';
 import Cart from './Pages/Cart';
+import { getAllMark } from './Store/Slice/GetAllBookMark';
 
 
 function AdminRoute({ children }) {
@@ -57,6 +58,7 @@ function App() {
   const userState=useSelector(state=>state?.user);
   const bookStates = useSelector(state => state?.books);
   const cartStates = useSelector(state => state?.carts);
+  const markStates = useSelector(state => state?.bookmarks);
   const dispatch=useDispatch();
   useState(()=>{
 if(!userState?.data){
@@ -67,6 +69,9 @@ if(!bookStates?.data){
 }
 if(!cartStates?.data){
   dispatch(getAllCart());
+}
+if(!markStates?.data){
+  dispatch(getAllMark());
 }
   },[]);
   function HomeRestrictForAdmin({children}){

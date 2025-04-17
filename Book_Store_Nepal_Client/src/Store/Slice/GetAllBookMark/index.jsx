@@ -1,11 +1,11 @@
 import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
 import axiosService from "@/Services/Axios";
 
-export const getAllCart=createAsyncThunk("getAllCart",async ()=>{
+export const getAllMark=createAsyncThunk("getAllMark",async ()=>{
   try{
-      const carts=await axiosService.get("/api/cart/getAllCarts",{withCredentials:true});
-      if (carts?.data) {
-        return carts.data?.$values;
+      const marks=await axiosService.get("/api/whitelist/getAllBookMark",{withCredentials:true});
+      if (marks?.data) {
+        return marks.data?.$values;
       } 
   }
   catch(error){
@@ -13,8 +13,8 @@ export const getAllCart=createAsyncThunk("getAllCart",async ()=>{
   }
 });
 
-const getAllCartSlice=createSlice({
-    name:'carts',
+const getAllMarkSlice=createSlice({
+    name:'bookmarks',
     initialState:{
         status:"pending",
         data:null,
@@ -22,16 +22,16 @@ const getAllCartSlice=createSlice({
         loading:true
     },
     extraReducers:(builder)=>{
-        builder.addCase(getAllCart.fulfilled,(state,action)=>{
+        builder.addCase(getAllMark.fulfilled,(state,action)=>{
             state.status="fulfilled"
             state.data=action.payload;
             state.loading=false;
         })
-        .addCase(getAllCart.pending,(state,action)=>{
+        .addCase(getAllMark.pending,(state,action)=>{
           state.status="pending";
           state.loading=true;
         })
-        .addCase(getAllCart.rejected, (state, action) => {
+        .addCase(getAllMark.rejected, (state, action) => {
             state.status = "failed";
             state.error = action.error.message;
             state.loading=false;
@@ -40,4 +40,4 @@ const getAllCartSlice=createSlice({
 
 
 })
-export default getAllCartSlice.reducer;
+export default getAllMarkSlice.reducer;

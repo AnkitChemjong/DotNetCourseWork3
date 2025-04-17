@@ -5,7 +5,7 @@ export const getAllBook=createAsyncThunk("getAllBook",async ()=>{
   try{
       const books=await axiosService.get("/api/book/getAllBooks",{withCredentials:true});
       if (books?.data) {
-        return books.data;
+        return books.data?.$values;
       } 
   }
   catch(error){

@@ -29,7 +29,7 @@ const Cart = () => {
       <div className="container mx-auto px-4 py-8 flex-grow mt-15">
         <h1 className="text-2xl font-bold mb-6">Your Shopping Cart</h1>
         
-        {userCart.length > 0 ? (
+        {userCart?.length > 0 ? (
           <div className="bg-white rounded-lg shadow-md p-6">
             <Table>
               <TableCaption>Your cart items</TableCaption>

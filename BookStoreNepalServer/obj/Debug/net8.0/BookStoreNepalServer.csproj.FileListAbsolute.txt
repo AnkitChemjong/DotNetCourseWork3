@@ -240,3 +240,4 @@ D:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\obj\Debug\net8.0\refint\Boo
 D:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\obj\Debug\net8.0\BookStoreNepalServer.pdb
 D:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\obj\Debug\net8.0\BookStoreNepalServer.genruntimeconfig.cache
 D:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\obj\Debug\net8.0\ref\BookStoreNepalServer.dll
+d:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\obj\Debug\net8.0\BookStoreNepalServer.sourcelink.json

@@ -13,10 +13,13 @@ import {
 } from "@/components/ui/tabs";
 import axiosService from '@/Services/Axios';
 import { getAllCart } from '@/Store/Slice/AllCartSlice';
+import { getAllMark } from '@/Store/Slice/GetAllBookMark';
 
 const BookDetails = () => {
   const userState=useSelector(state=>state?.user);
   const {data:user}=userState;
+  const markState=useSelector(state=>state?.bookmarks);
+  const {data:marks}=markState;
   const dispatch=useDispatch();
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
@@ -54,14 +57,20 @@ const BookDetails = () => {
   }
   const handleBookMark=async(data)=>{
     try{
-      const finalData={userId:user?.userId,bookId:data?.bookId};
-      const response=await axiosService.post('/api/whitelist/addBookMark',finalData);
-      console.log(response);
-      if(response?.status===200){
-        // dispatch(getAllCart());
-        alert(response?.data?.message);
+      const userMarks=marks?.find(item=>item?.userId===user?.userId&&item?.book?.bookId===data?.bookId);
+      if(userMarks){
+        alert("Book already Bookmarked.")
       }
+      else{
 
+        const finalData={userId:user?.userId,bookId:data?.bookId};
+        const response=await axiosService.post('/api/whitelist/addBookMark',finalData);
+        // console.log(response);
+        if(response?.status===200){
+        dispatch(getAllMark());
+          alert(response?.data?.message);
+        }
+      }
     }
     catch(error){
       console.log(error);

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookStoreNepalServer.Models;
 
@@ -59,6 +60,7 @@ public class Books
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
          public ICollection<Cart> Carts { get; set; } = new List<Cart>();
+         [InverseProperty("Book")]
         public ICollection<Whitelist> WhiteLists { get; set; } = new List<Whitelist>();
 
 }
