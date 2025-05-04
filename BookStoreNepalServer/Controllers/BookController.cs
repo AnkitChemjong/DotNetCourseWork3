@@ -34,7 +34,7 @@ namespace BookStoreNepalServer.Controllers
                 return Conflict("A book with this ISBN already exists.");
             }
 
-   
+
             await _db.Books.AddAsync(book);
             await _db.SaveChangesAsync();
 

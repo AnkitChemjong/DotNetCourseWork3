@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using System.Text;
 using BookStoreNepalServer.DTO;
+using BCrypt.Net;
 
 namespace BookStoreNepalServer.Controllers
 {
@@ -18,7 +19,9 @@ namespace BookStoreNepalServer.Controllers
     public class UserController : ControllerBase
     {
         private readonly DB _db;
-        private readonly IConfiguration _config; 
+        private readonly IConfiguration _config;
+
+        
 
         public UserController(DB db, IConfiguration config)
         {
@@ -39,6 +42,9 @@ namespace BookStoreNepalServer.Controllers
             {
                 return Conflict(new { message = "User with this email already exists" });
             }
+
+             user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+         
         
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
@@ -54,6 +60,10 @@ namespace BookStoreNepalServer.Controllers
         user = user 
     };
 
+      
+
+        
+  
     return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, response);
         }
         
@@ -67,20 +77,25 @@ namespace BookStoreNepalServer.Controllers
                 return BadRequest(ModelState);
             }
 
-        
-            var user = await _db.Users.SingleOrDefaultAsync(u => 
-                u.Email == loginDto.Email && 
-                u.Password == loginDto.Password
-            );
 
-            if (user == null)
-            {
-                return Unauthorized("Invalid email or password");
-            }
+            
 
         
+                    var user = await _db.Users
+                    .SingleOrDefaultAsync(u => u.Email == loginDto.Email);
+
+                if (user == null)
+                    return Unauthorized("Invalid email or password");
+
+
+           bool isPasswordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password);
+    if (!isPasswordValid)
+        return Unauthorized("Invalid email or password");
+
+                    
             var tokenString = GenerateJwtToken(user);
-            // Set cookie
+
+
     Response.Cookies.Append("token", tokenString, new CookieOptions
     {
         HttpOnly = true,

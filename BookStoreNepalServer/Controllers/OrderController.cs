@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookStoreNepalServer.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/order")]
     [ApiController]
     public class OrderController : ControllerBase
     {
@@ -17,50 +17,142 @@ namespace BookStoreNepalServer.Controllers
             _db = db;
         }
 
+
+
+
+   [HttpPost("place-from-cart/{userId}")]
+    public async Task<IActionResult> PlaceOrderFromCart(int userId)
+    {
+
+        var cartItems = await _db.Carts
+            .Include(c => c.Book)
+            .Where(c => c.UserId == userId)
+            .ToListAsync();
+
+        if (cartItems == null || !cartItems.Any())
+            return BadRequest("No items in cart.");
+
     
-        [HttpPost("place")]
-        public async Task<IActionResult> PlaceOrder([FromQuery] int userId, [FromBody] OrderItem[] orderItems)
-        {
- 
-            decimal totalPrice = orderItems.Sum(item => item.UnitPrice * item.Quantity);
+        var orderItems = cartItems.Select(ci => new OrderItem {
+            BookId    = ci.BookId,
+            Quantity  = ci.TotalItems,
+            UnitPrice = ci.Book.Price
+        }).ToList();
 
-          
-            int totalBooks = orderItems.Sum(item => item.Quantity);
-            decimal discountPercent = 0;
+    
+        decimal totalPrice = orderItems.Sum(oi => oi.UnitPrice * oi.Quantity);
+        int totalBooks     = orderItems.Sum(oi => oi.Quantity);
 
-            if (totalBooks >= 5)
-                discountPercent += 5;
-                
-            int successfulOrders = await _db.Orders.CountAsync(o => o.UserId == userId && o.Status == "Claimed");
-            if (successfulOrders > 0 && successfulOrders % 10 == 0)
-                discountPercent += 10;
+        decimal discountPct = 0m;
+        if (totalBooks >= 5) discountPct += 5m;
 
-            decimal discountAmount = totalPrice * discountPercent / 100;
-            decimal finalPrice = totalPrice - discountAmount;
+        int claimedCount = await _db.Orders
+            .CountAsync(o => o.UserId == userId && o.Status == "Claimed");
+        if (claimedCount > 0 && claimedCount % 10 == 0)
+            discountPct += 10m;
 
-            Orders order = new Orders
-            {
-                UserId = userId,
-                TotalPrice = finalPrice,
-                DiscountPercent = discountPercent,
+        decimal discountAmt = totalPrice * discountPct / 100m;
+        decimal finalPrice  = totalPrice - discountAmt;
+
+        // 4️⃣ Create Order
+        var order = new Orders {
+            UserId          = userId,
+            TotalPrice      = finalPrice,
+            DiscountPercent = discountPct,
+            Status          = "Placed",
+            OrderDate       = DateTime.UtcNow
   
-                Status = "Placed",
-                OrderDate = DateTime.UtcNow
-            };
+        };
 
+ 
+        using var tx = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            // a) Save order to get OrderId
             await _db.Orders.AddAsync(order);
             await _db.SaveChangesAsync();
 
-      
-            foreach(var item in orderItems)
+            // b) Insert OrderItems
+            foreach (var oi in orderItems)
             {
-                item.OrderId = order.OrderId;
-                await _db.OrderItems.AddAsync(item);
+                oi.OrderId = order.OrderId;
+                await _db.OrderItems.AddAsync(oi);
             }
-            await _db.SaveChangesAsync();
 
-            return Ok(new { message = "Order placed successfully", claimCode = order.ClaimCode, order });
+            // c) Decrement stock on each Book
+            foreach (var ci in cartItems)
+            {
+                ci.Book.Stock -= ci.TotalItems;
+                if (ci.Book.Stock < 0)
+                    return BadRequest($"Not enough stock for book {ci.Book.Title}");
+            }
+
+            // d) Remove all cart items
+            _db.Carts.RemoveRange(cartItems);
+
+            // e) Commit
+            await _db.SaveChangesAsync();
+            await tx.CommitAsync();
         }
+        catch (Exception ex)
+        {
+            await tx.RollbackAsync();
+            return StatusCode(500, new { message = "Failed to place order", error = ex.Message });
+        }
+
+        // 6️⃣ Return
+        return Ok(new {
+            message    = "Order placed successfully",
+            claimCode  = order.ClaimCode,
+            orderId    = order.OrderId,
+            totalPrice = finalPrice
+        });
+    }
+
+    
+        // [HttpPost("place")]
+        // public async Task<IActionResult> PlaceOrder([FromQuery] int userId, [FromBody] OrderItem[] orderItems)
+        // {
+ 
+        //     decimal totalPrice = orderItems.Sum(item => item.UnitPrice * item.Quantity);
+
+          
+        //     int totalBooks = orderItems.Sum(item => item.Quantity);
+        //     decimal discountPercent = 0;
+
+        //     if (totalBooks >= 5)
+        //         discountPercent += 5;
+                
+        //     int successfulOrders = await _db.Orders.CountAsync(o => o.UserId == userId && o.Status == "Claimed");
+        //     if (successfulOrders > 0 && successfulOrders % 10 == 0)
+        //         discountPercent += 10;
+
+        //     decimal discountAmount = totalPrice * discountPercent / 100;
+        //     decimal finalPrice = totalPrice - discountAmount;
+
+        //     Orders order = new Orders
+        //     {
+        //         UserId = userId,
+        //         TotalPrice = finalPrice,
+        //         DiscountPercent = discountPercent,
+  
+        //         Status = "Placed",
+        //         OrderDate = DateTime.UtcNow
+        //     };
+
+        //     await _db.Orders.AddAsync(order);
+        //     await _db.SaveChangesAsync();
+
+      
+        //     foreach(var item in orderItems)
+        //     {
+        //         item.OrderId = order.OrderId;
+        //         await _db.OrderItems.AddAsync(item);
+        //     }
+        //     await _db.SaveChangesAsync();
+
+        //     return Ok(new { message = "Order placed successfully", claimCode = order.ClaimCode, order });
+        // }
 
         // // GET: api/order/{orderId}
         // [HttpGet("{orderId}")]

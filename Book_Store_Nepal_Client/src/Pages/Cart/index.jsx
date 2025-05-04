@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import UserNavbar from '@/Components/UserNavbar';
 import Footer from '@/Components/Footer';
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { FiTrash2, FiShoppingCart, FiX } from 'react-icons/fi';
+import axiosService from '@/Services/Axios';
 
 const Cart = () => {
   const cartState = useSelector(state => state?.carts);
@@ -21,6 +22,48 @@ const Cart = () => {
   const { data: user } = userState;
 
   const userCart = cartData?.filter(cart => cart.userId === user?.userId);
+
+
+  console.log("userid",user?.userId);
+
+
+  useEffect(()=>{
+    console.log("usercart id",userCart);
+  })
+
+  
+  const handleOrder=async()=>{
+    try{
+      const response=await axiosService.post(`/api/order/place-from-cart/${user?.userId}`);
+      console.log(response);
+      if(response?.status===200){
+        alert(response?.data?.message);
+      }
+
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+
+
+
+
+  const cancelCart=async()=>{
+    try{
+      const response=await axiosService.delete(`/api/cart/${userCart[0].cartId}`);
+      console.log(response);
+      if(response?.status===200){
+        alert(response?.data?.message);
+      }
+
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+
+  
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -52,17 +95,9 @@ const Cart = () => {
                       {new Date(cart.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right space-x-2">
-                      <Button variant="outline" size="sm" className="text-red-600">
+                      <Button variant="outline" size="sm" className="text-red-600" onClick={cancelCart}>
                         <FiTrash2 className="mr-2 h-4 w-4" />
                         Remove
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <FiX className="mr-2 h-4 w-4" />
-                        Discard
-                      </Button>
-                      <Button size="sm">
-                        <FiShoppingCart className="mr-2 h-4 w-4" />
-                        Place Order
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -76,7 +111,7 @@ const Cart = () => {
                 <FiTrash2 className="mr-2 h-4 w-4" />
                 Clear Entire Cart
               </Button>
-              <Button className="text-black">
+              <Button className="text-black" onClick={handleOrder}>
                 <FiShoppingCart className="mr-2 h-4 w-4" />
                 Checkout All Items
               </Button>

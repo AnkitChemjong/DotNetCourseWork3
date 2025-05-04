@@ -37,5 +37,45 @@ public async Task<ActionResult<IEnumerable<Cart>>> GetAllCarts()
 
     return Ok(carts); 
 }
+
+
+
+[HttpDelete("{id}")]
+public async Task<IActionResult> RemoveFromCart(int id)
+{
+  
+    var cartItem = await _db.Carts.FindAsync(id);
+    if (cartItem == null)
+        return NotFound(new { message = $"No cart item found with ID {id}." });
+
+ 
+    _db.Carts.Remove(cartItem);
+    await _db.SaveChangesAsync();
+
+
+    return Ok(new { message = "Item removed from cart successfully." });
+}
+
+
+
+
+[HttpDelete("clear/{userId}")]
+public async Task<IActionResult> ClearCart(int userId)
+{
+
+    var userCartItems = await _db.Carts
+        .Where(c => c.UserId == userId)
+        .ToListAsync();
+
+    if (userCartItems == null || userCartItems.Count == 0)
+        return NoContent();  
+
+
+    _db.Carts.RemoveRange(userCartItems);
+    await _db.SaveChangesAsync();
+
+    return Ok(new { message = "All cart items cleared for user " + userId });
+}
+
     }
 }
