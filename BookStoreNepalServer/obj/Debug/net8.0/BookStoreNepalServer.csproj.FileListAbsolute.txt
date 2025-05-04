@@ -364,3 +364,4 @@ D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\obj\Debug\net8.0\BookStoreNep
 D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\obj\Debug\net8.0\BookStoreNepalServer.genruntimeconfig.cache
 D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\obj\Debug\net8.0\ref\BookStoreNepalServer.dll
 D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\BCrypt.Net-Next.dll
+d:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\bin\Debug\net8.0\BCrypt.Net-Next.dll

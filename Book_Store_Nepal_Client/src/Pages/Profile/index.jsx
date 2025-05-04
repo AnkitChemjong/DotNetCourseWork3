@@ -2,12 +2,15 @@ import React,{useState,useEffect} from 'react';
 import { useSelector } from 'react-redux';
 import UserNavbar from '@/Components/UserNavbar';
 import Footer from '@/Components/Footer';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import axiosService from '@/Services/Axios';
 import { getAllMark } from '@/Store/Slice/GetAllBookMark';
 import { useDispatch } from 'react-redux';
+import { Button } from '@/Components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 function Profile() {
+  const navigate=useNavigate();
   const dispatch=useDispatch();
   const [userMark,setUserMark]=useState([]);
   const userState = useSelector(state => state?.user);
@@ -70,6 +73,7 @@ function Profile() {
                 <p className="text-sm font-medium text-blue-600 uppercase">{user?.role}</p>
               </div>
             </div>
+            <div className='flex justify-between'>
             <div className="mt-6">
               <h3 className="text-lg font-semibold mb-2">Account Details</h3>
               <div className="space-y-2 text-sm text-gray-700">
@@ -77,6 +81,8 @@ function Profile() {
                 <p><span className="font-semibold">Email:</span> {user?.email}</p>
                 <p><span className="font-semibold">Role:</span> {user?.role}</p>
               </div>
+            </div>
+            <Button onClick={()=>navigate('/userorder')} className="text-black hover:bg-amber-400">My Orders</Button>
             </div>
           </div>
 

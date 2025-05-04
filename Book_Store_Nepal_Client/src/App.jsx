@@ -16,6 +16,8 @@ import { getAllBook } from './Store/Slice/AllBookSlice';
 import { getAllCart } from './Store/Slice/AllCartSlice';
 import Cart from './Pages/Cart';
 import { getAllMark } from './Store/Slice/GetAllBookMark';
+import UserOrders from './Pages/UserOrders';
+import { getAllOrder } from './Store/Slice/AllOrderSlice';
 
 
 function AdminRoute({ children }) {
@@ -59,6 +61,7 @@ function App() {
   const bookStates = useSelector(state => state?.books);
   const cartStates = useSelector(state => state?.carts);
   const markStates = useSelector(state => state?.bookmarks);
+  const orderStates = useSelector(state => state?.orders);
   const dispatch=useDispatch();
   useState(()=>{
 if(!userState?.data){
@@ -72,6 +75,9 @@ if(!cartStates?.data){
 }
 if(!markStates?.data){
   dispatch(getAllMark());
+}
+if(!orderStates?.data){
+  dispatch(getAllOrder());
 }
   },[]);
   function HomeRestrictForAdmin({children}){
@@ -98,6 +104,7 @@ if(!markStates?.data){
         <Route path='/cart' element={<PrivateRoute><Cart/></PrivateRoute>}/>
         <Route path='/book-details/:id' element={<PrivateRoute><BookDetails/></PrivateRoute>}/>
         <Route path='/profile' element={<PrivateRoute><Profile/></PrivateRoute>}/>
+        <Route path='/userorder' element={<PrivateRoute><UserOrders/></PrivateRoute>}/>
         <Route path='/admin/dashboard' element={<AdminRoute><AdminDashboard/></AdminRoute>}/>
         <Route path='/admin/addbook' element={<AdminRoute><AddBook/></AdminRoute>}/>
       </Routes>

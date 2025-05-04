@@ -168,8 +168,8 @@ namespace BookStoreNepalServer.Controllers
         // }
 
         // DELETE: api/order/cancel/{orderId}?userId=1
-        [HttpDelete("cancel/{orderId}")]
-        public async Task<IActionResult> CancelOrder(int orderId, [FromQuery] int userId)
+        [HttpPatch("cancel/{orderId}/{userId}")]
+        public async Task<IActionResult> CancelOrder([FromRoute] int orderId, [FromRoute] int userId)
         {
             var order = await _db.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
             if (order == null)
@@ -184,5 +184,20 @@ namespace BookStoreNepalServer.Controllers
 
             return Ok("Order canceled successfully.");
         }
+
+       [HttpGet("getAllOrders")]
+public async Task<ActionResult<IEnumerable<Orders>>> GetAllOrders()
+{
+    var orders = await _db.Orders
+        .Include(o => o.OrderItems)
+        .ToListAsync();
+
+    if (orders == null || !orders.Any())
+    {
+        return Ok(null);
+    }
+
+    return Ok(orders);
+}
     }
 }
