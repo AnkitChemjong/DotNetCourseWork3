@@ -27,7 +27,9 @@ const {data:marks}=markState;
   const [searchTerm, setSearchTerm] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState({});
+  const [tetikai,setTetikai]=useState("");
   const [filters, setFilters] = useState({
+
     genre: [],
     availability: [],
     priceRange: [0, 1000],
