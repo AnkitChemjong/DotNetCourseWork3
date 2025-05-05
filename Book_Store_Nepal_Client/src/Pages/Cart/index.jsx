@@ -14,17 +14,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { FiTrash2, FiShoppingCart, FiX } from 'react-icons/fi';
 import axiosService from '@/Services/Axios';
+import { getAllCart } from '@/Store/Slice/AllCartSlice';
+import { useDispatch } from 'react-redux';
+import { getAllBook } from '@/Store/Slice/AllBookSlice';
 
 const Cart = () => {
   const cartState = useSelector(state => state?.carts);
   const { data: cartData = [] } = cartState;
   const userState = useSelector(state => state?.user);
   const { data: user } = userState;
+  const dispatch=useDispatch();
 
   const userCart = cartData?.filter(cart => cart.userId === user?.userId);
-
-
-  console.log("userid",user?.userId);
 
 
   useEffect(()=>{
@@ -38,6 +39,9 @@ const Cart = () => {
       console.log(response);
       if(response?.status===200){
         alert(response?.data?.message);
+        clearAllCart();
+        dispatch(getAllCart());
+        dispatch(getAllBook());
       }
 
     }
@@ -55,6 +59,21 @@ const Cart = () => {
       console.log(response);
       if(response?.status===200){
         alert(response?.data?.message);
+        dispatch(getAllCart());
+      }
+
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+  const clearAllCart=async()=>{
+    try{
+      const response=await axiosService.delete(`/api/cart/clear/${user?.userId}`);
+      console.log(response);
+      if(response?.status===200){
+        alert(response?.data?.message);
+        dispatch(getAllCart());
       }
 
     }
@@ -107,7 +126,7 @@ const Cart = () => {
 
             <div className="mt-6 flex justify-end space-x-4">
                 <p>Total:-{userCart?.reduce((acc,obj)=>acc+Number(obj?.cartTotal||0),0)}</p>
-              <Button variant="outline" className="text-red-600">
+              <Button onClick={clearAllCart} variant="outline" className="text-red-600">
                 <FiTrash2 className="mr-2 h-4 w-4" />
                 Clear Entire Cart
               </Button>

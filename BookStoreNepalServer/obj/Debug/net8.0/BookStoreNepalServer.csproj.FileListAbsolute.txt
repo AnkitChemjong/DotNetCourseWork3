@@ -364,3 +364,14 @@ D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\obj\Debug\net8.0\BookStoreNep
 D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\obj\Debug\net8.0\BookStoreNepalServer.genruntimeconfig.cache
 D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\obj\Debug\net8.0\ref\BookStoreNepalServer.dll
 D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\BCrypt.Net-Next.dll
+d:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\bin\Debug\net8.0\BCrypt.Net-Next.dll
+d:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+d:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\bin\Debug\net8.0\MailKit.dll
+d:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\bin\Debug\net8.0\MimeKit.dll
+d:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+d:\ASINGMENTS\.net\sem2\Project\BookStoreNepalServer\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\BouncyCastle.Cryptography.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\MailKit.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\MimeKit.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll

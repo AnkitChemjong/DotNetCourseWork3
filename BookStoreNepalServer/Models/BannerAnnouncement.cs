@@ -19,6 +19,7 @@ namespace BookStoreNepalServer.Models
          public DateTime EndTime { get; set; }
 
         [Required(ErrorMessage = "UserId is required.")]
+        
         public int UserId { get; set; }
 
         public Users User { get; set; }

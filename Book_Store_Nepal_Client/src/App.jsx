@@ -16,6 +16,10 @@ import { getAllBook } from './Store/Slice/AllBookSlice';
 import { getAllCart } from './Store/Slice/AllCartSlice';
 import Cart from './Pages/Cart';
 import { getAllMark } from './Store/Slice/GetAllBookMark';
+import UserOrders from './Pages/UserOrders';
+import { getAllOrder } from './Store/Slice/AllOrderSlice';
+import AllBooks from './Pages/AdminBookDetails';
+import UpdateBook from './Pages/UpdateBook';
 
 
 function AdminRoute({ children }) {
@@ -44,7 +48,11 @@ const PrivateRoute = ({ children }) => {
     } else {
       return children;
     }
-  } }
+  }
+  else{
+    return <Navigate to="/sign-in" />;
+  }
+}
 const AuthRoute=({children})=>{
   const userStates = useSelector(state => state?.user);
   const { data: user, loading } = userStates;
@@ -59,6 +67,7 @@ function App() {
   const bookStates = useSelector(state => state?.books);
   const cartStates = useSelector(state => state?.carts);
   const markStates = useSelector(state => state?.bookmarks);
+  const orderStates = useSelector(state => state?.orders);
   const dispatch=useDispatch();
   useState(()=>{
 if(!userState?.data){
@@ -72,6 +81,9 @@ if(!cartStates?.data){
 }
 if(!markStates?.data){
   dispatch(getAllMark());
+}
+if(!orderStates?.data){
+  dispatch(getAllOrder());
 }
   },[]);
   function HomeRestrictForAdmin({children}){
@@ -98,8 +110,11 @@ if(!markStates?.data){
         <Route path='/cart' element={<PrivateRoute><Cart/></PrivateRoute>}/>
         <Route path='/book-details/:id' element={<PrivateRoute><BookDetails/></PrivateRoute>}/>
         <Route path='/profile' element={<PrivateRoute><Profile/></PrivateRoute>}/>
+        <Route path='/userorder' element={<PrivateRoute><UserOrders/></PrivateRoute>}/>
         <Route path='/admin/dashboard' element={<AdminRoute><AdminDashboard/></AdminRoute>}/>
         <Route path='/admin/addbook' element={<AdminRoute><AddBook/></AdminRoute>}/>
+        <Route path='/admin/managebook' element={<AdminRoute><AllBooks/></AdminRoute>}/>
+        <Route path='/admin/updatebook/:id' element={<AdminRoute><UpdateBook/></AdminRoute>}/>
       </Routes>
       
     </Router>

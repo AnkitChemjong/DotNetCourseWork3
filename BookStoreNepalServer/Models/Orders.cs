@@ -31,5 +31,6 @@ public class Orders
 
         
         public Users User { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; }= new List<OrderItem>();
 
 }

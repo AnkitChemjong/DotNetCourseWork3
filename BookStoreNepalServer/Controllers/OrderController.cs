@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using BookStoreNepalServer.Models;
 using BookStoreNepalServer.Database;
 using Microsoft.EntityFrameworkCore;
+using BookStoreNepalServer.Services.Email;
 
 namespace BookStoreNepalServer.Controllers
 {
@@ -12,10 +13,13 @@ namespace BookStoreNepalServer.Controllers
     {
 
         private readonly DB _db;
-        public OrderController(DB db)
-        {
-            _db = db;
-        }
+        private readonly EmailService _emailService;
+
+public OrderController(DB db, EmailService emailService)
+{
+    _db = db;
+    _emailService = emailService;
+}
 
 
 
@@ -23,6 +27,10 @@ namespace BookStoreNepalServer.Controllers
    [HttpPost("place-from-cart/{userId}")]
     public async Task<IActionResult> PlaceOrderFromCart(int userId)
     {
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+        if (user == null)
+               return NotFound("User not found");
+        
 
         var cartItems = await _db.Carts
             .Include(c => c.Book)
@@ -61,7 +69,6 @@ namespace BookStoreNepalServer.Controllers
             DiscountPercent = discountPct,
             Status          = "Placed",
             OrderDate       = DateTime.UtcNow
-  
         };
 
  
@@ -93,6 +100,19 @@ namespace BookStoreNepalServer.Controllers
             // e) Commit
             await _db.SaveChangesAsync();
             await tx.CommitAsync();
+            
+            string subject = "Order Confirmation - Book Store Nepal";
+           string body = $@"
+    <h2>Thank you for your order, {user.Name}!</h2>
+    <p>Your claim code is: <strong>{order.ClaimCode}</strong></p>
+    <p>Order ID: {order.OrderId}</p>
+    <p>Total Price: NPR {finalPrice:F2}</p>
+    <p>Date: {order.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")}</p>
+    <br/>
+    <p>We appreciate your purchase. Happy reading!</p>
+";
+
+await _emailService.SendEmailAsync(user.Email, subject, body);
         }
         catch (Exception ex)
         {
@@ -168,8 +188,8 @@ namespace BookStoreNepalServer.Controllers
         // }
 
         // DELETE: api/order/cancel/{orderId}?userId=1
-        [HttpDelete("cancel/{orderId}")]
-        public async Task<IActionResult> CancelOrder(int orderId, [FromQuery] int userId)
+        [HttpPatch("cancel/{orderId}/{userId}")]
+        public async Task<IActionResult> CancelOrder([FromRoute] int orderId, [FromRoute] int userId)
         {
             var order = await _db.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
             if (order == null)
@@ -184,5 +204,20 @@ namespace BookStoreNepalServer.Controllers
 
             return Ok("Order canceled successfully.");
         }
+
+       [HttpGet("getAllOrders")]
+public async Task<ActionResult<IEnumerable<Orders>>> GetAllOrders()
+{
+    var orders = await _db.Orders
+        .Include(o => o.OrderItems)
+        .ToListAsync();
+
+    if (orders == null || !orders.Any())
+    {
+        return Ok(null);
+    }
+
+    return Ok(orders);
+}
     }
 }

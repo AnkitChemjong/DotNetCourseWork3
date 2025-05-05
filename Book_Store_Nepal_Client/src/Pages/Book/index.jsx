@@ -28,6 +28,7 @@ const {data:marks}=markState;
   const [showFilters, setShowFilters] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState({});
   const [filters, setFilters] = useState({
+
     genre: [],
     availability: [],
     priceRange: [0, 1000],
@@ -225,11 +226,16 @@ const {data:marks}=markState;
   const handleAddToCart=async(data)=>{
     try{
       const finalData={totalItems:1,cartTotal:Number(data?.price),userId:user?.userId,bookId:data?.bookId};
-      const response=await axiosService.post('/api/cart/addToCart',finalData);
-      console.log(response);
-      if(response?.status===200){
-        dispatch(getAllCart());
-        alert(response?.data?.message);
+      if(Number(data?.stock)>=1){
+        const response=await axiosService.post('/api/cart/addToCart',finalData);
+        console.log(response);
+        if(response?.status===200){
+          dispatch(getAllCart());
+          alert(response?.data?.message);
+        }
+      }
+      else{
+        alert("Book is out of stock");
       }
 
     }

@@ -22,6 +22,8 @@ public class DB : DbContext
      public DbSet<Books> Books { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<Cart> Carts { get; set; }
+
+     public DbSet<BannerAnnouncement> BannerAnnouncement { get; set; }
     public DbSet<Whitelist> Whitelists { get; set; }
 
 }

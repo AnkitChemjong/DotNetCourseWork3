@@ -22,6 +22,35 @@ namespace BookStoreNepalServer.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("BookStoreNepalServer.Models.BannerAnnouncement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BannerAnnouncement");
+                });
+
             modelBuilder.Entity("BookStoreNepalServer.Models.Books", b =>
                 {
                     b.Property<int>("BookId")
@@ -279,6 +308,17 @@ namespace BookStoreNepalServer.Migrations
                     b.ToTable("Whitelists");
                 });
 
+            modelBuilder.Entity("BookStoreNepalServer.Models.BannerAnnouncement", b =>
+                {
+                    b.HasOne("BookStoreNepalServer.Models.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BookStoreNepalServer.Models.Cart", b =>
                 {
                     b.HasOne("BookStoreNepalServer.Models.Books", "Book")
@@ -307,7 +347,7 @@ namespace BookStoreNepalServer.Migrations
                         .IsRequired();
 
                     b.HasOne("BookStoreNepalServer.Models.Orders", "Order")
-                        .WithMany()
+                        .WithMany("OrderItems")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -373,6 +413,11 @@ namespace BookStoreNepalServer.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("WhiteLists");
+                });
+
+            modelBuilder.Entity("BookStoreNepalServer.Models.Orders", b =>
+                {
+                    b.Navigation("OrderItems");
                 });
 
             modelBuilder.Entity("BookStoreNepalServer.Models.Users", b =>
