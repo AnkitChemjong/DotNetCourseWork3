@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import UserNavbar from '@/Components/UserNavbar';
 import Footer from '@/Components/Footer';
@@ -24,13 +24,16 @@ const Cart = () => {
   const userState = useSelector(state => state?.user);
   const { data: user } = userState;
   const dispatch=useDispatch();
-
-  const userCart = cartData?.filter(cart => cart.userId === user?.userId);
+  const [userCart,setUserCart]=useState([]);
 
 
   useEffect(()=>{
-    console.log("usercart id",userCart);
-  })
+    if(user){
+      const userCartData = cartData?.filter(cart => cart.userId === user?.userId);
+      setUserCart(userCartData);
+    }
+    console.log("usercart id haita",userCart);
+  },[user]);
 
   
   const handleOrder=async()=>{

@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "geRY9+smf8REsH2llokI8yzQpRR9wSThpdsSHCU88lU=",
+  "Source": "BookStoreNepalServer",
+  "BasePath": "_content/BookStoreNepalServer",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
