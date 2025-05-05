@@ -33,8 +33,8 @@ const BookDetails = () => {
 
   // Find the specific book by id
   useEffect(() => {
-    if (allBooks.length > 0) {
-      const foundBook = allBooks.find(book => book.bookId === parseInt(id));
+    if (allBooks?.length > 0) {
+      const foundBook = allBooks?.find(book => book.bookId === parseInt(id));
       setBook(foundBook);
       setLoading(false);
     }
@@ -43,11 +43,16 @@ const BookDetails = () => {
   const handleAddToCart=async()=>{
     try{
       const finalData={totalItems:quantity,cartTotal:quantity*Number(book?.price),userId:user?.userId,bookId:book?.bookId};
-      const response=await axiosService.post('/api/cart/addToCart',finalData);
-      console.log(response);
-      if(response?.status===200){
-        dispatch(getAllCart());
-        alert(response?.data?.message);
+      if(quantity<=Number(book?.stock)){
+        const response=await axiosService.post('/api/cart/addToCart',finalData);
+        console.log(response);
+        if(response?.status===200){
+          dispatch(getAllCart());
+          alert(response?.data?.message);
+        }
+      }
+      else{
+        alert("Quantity is more than Stock.");
       }
 
     }

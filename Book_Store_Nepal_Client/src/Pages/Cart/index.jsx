@@ -16,6 +16,7 @@ import { FiTrash2, FiShoppingCart, FiX } from 'react-icons/fi';
 import axiosService from '@/Services/Axios';
 import { getAllCart } from '@/Store/Slice/AllCartSlice';
 import { useDispatch } from 'react-redux';
+import { getAllBook } from '@/Store/Slice/AllBookSlice';
 
 const Cart = () => {
   const cartState = useSelector(state => state?.carts);
@@ -25,9 +26,6 @@ const Cart = () => {
   const dispatch=useDispatch();
 
   const userCart = cartData?.filter(cart => cart.userId === user?.userId);
-
-
-  console.log("userid",user?.userId);
 
 
   useEffect(()=>{
@@ -43,6 +41,7 @@ const Cart = () => {
         alert(response?.data?.message);
         clearAllCart();
         dispatch(getAllCart());
+        dispatch(getAllBook());
       }
 
     }

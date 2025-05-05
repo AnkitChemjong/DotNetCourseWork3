@@ -3,13 +3,16 @@ using BookStoreNepalServer.Database;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using BookStoreNepalServer.Services.Email;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DB>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-    
+builder.Services.Configure<SmtpSettings>(
+    builder.Configuration.GetSection("SmtpSettings"));
+builder.Services.AddTransient<EmailService>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>

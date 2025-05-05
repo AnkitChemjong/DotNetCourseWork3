@@ -46,7 +46,11 @@ const PrivateRoute = ({ children }) => {
     } else {
       return children;
     }
-  } }
+  }
+  else{
+    return <Navigate to="/sign-in" />;
+  }
+}
 const AuthRoute=({children})=>{
   const userStates = useSelector(state => state?.user);
   const { data: user, loading } = userStates;
