@@ -18,6 +18,8 @@ import Cart from './Pages/Cart';
 import { getAllMark } from './Store/Slice/GetAllBookMark';
 import UserOrders from './Pages/UserOrders';
 import { getAllOrder } from './Store/Slice/AllOrderSlice';
+import AllBooks from './Pages/AdminBookDetails';
+import UpdateBook from './Pages/UpdateBook';
 
 
 function AdminRoute({ children }) {
@@ -111,6 +113,8 @@ if(!orderStates?.data){
         <Route path='/userorder' element={<PrivateRoute><UserOrders/></PrivateRoute>}/>
         <Route path='/admin/dashboard' element={<AdminRoute><AdminDashboard/></AdminRoute>}/>
         <Route path='/admin/addbook' element={<AdminRoute><AddBook/></AdminRoute>}/>
+        <Route path='/admin/managebook' element={<AdminRoute><AllBooks/></AdminRoute>}/>
+        <Route path='/admin/updatebook/:id' element={<AdminRoute><UpdateBook/></AdminRoute>}/>
       </Routes>
       
     </Router>

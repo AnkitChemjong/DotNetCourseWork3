@@ -24,6 +24,12 @@ const AdminSidebar = () => {
       path: '/admin/addbook',
       icon: <FaBookMedical className="mr-2" />,
     },
+
+    {
+      pageName: "Manage Book",
+      path: '/admin/managebook',
+      icon: <FaBookMedical className="mr-2" />,
+    },
   ];
   const handleLogout=async()=>{
     try{

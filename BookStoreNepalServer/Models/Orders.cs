@@ -25,11 +25,11 @@ public class Orders
         [Range(0, 100, ErrorMessage = "Discount must be between 0% and 100%")]
         public decimal? DiscountPercent { get; set; }
 
-        // Foreign Key
+     
         [Required]
         public int UserId { get; set; }
 
-        // Navigation
+        
         public Users User { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; }= new List<OrderItem>();
 
