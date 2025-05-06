@@ -129,7 +129,7 @@ const Cart = () => {
                 {userCart.map((cart) => (
                   <TableRow key={cart.cartId}>
                     <TableCell className="font-medium">{cart.cartId}</TableCell>
-                    <TableCell>{cart.totalItems}</TableCell>
+                    <TableCell>{cart.book.title}-{cart.totalItems}</TableCell>
                     <TableCell>Rs {Number(cart.cartTotal)/Number(cart.totalItems)}</TableCell>
                     <TableCell>Rs {cart.cartTotal.toFixed(2)}</TableCell>
                     <TableCell>

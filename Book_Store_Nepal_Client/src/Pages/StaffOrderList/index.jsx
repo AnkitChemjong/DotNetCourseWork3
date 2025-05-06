@@ -43,7 +43,7 @@ const StaffOrderList = () => {
                         <p>Loading orders...</p>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <div className="bg-white rounded-lg shadow overflow-auto max-h-96 max-w-[1000px]">
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 overflow-auto">
                                 <thead className="bg-gray-50">
