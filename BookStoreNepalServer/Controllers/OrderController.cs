@@ -4,6 +4,7 @@ using BookStoreNepalServer.Models;
 using BookStoreNepalServer.Database;
 using Microsoft.EntityFrameworkCore;
 using BookStoreNepalServer.Services.Email;
+using System.Text;
 
 namespace BookStoreNepalServer.Controllers
 {
@@ -205,19 +206,226 @@ await _emailService.SendEmailAsync(user.Email, subject, body);
             return Ok("Order canceled successfully.");
         }
 
-       [HttpGet("getAllOrders")]
+      [HttpGet("getAllOrders")]
 public async Task<ActionResult<IEnumerable<Orders>>> GetAllOrders()
 {
     var orders = await _db.Orders
-        .Include(o => o.OrderItems)
+        .Include(o => o.User)          // Include User details
+        .Include(o => o.OrderItems)    // Include OrderItems
+            .ThenInclude(oi => oi.Book) // Include Book details for each OrderItem
+        .AsNoTracking()                // Recommended for read-only operations
         .ToListAsync();
 
     if (orders == null || !orders.Any())
     {
-        return Ok(null);
+        return Ok(new List<Orders>()); // Return empty list instead of null
     }
 
     return Ok(orders);
 }
+
+[HttpPost("verify/{userId}/{orderId}/{code}")]
+public async Task<ActionResult> CheckClaimCode(
+    [FromRoute] int userId,
+    [FromRoute] int orderId,
+    [FromRoute] string code)
+{
+    var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+    if (user == null)
+        return NotFound(new { 
+            Success = false, 
+            Message = "User not found." 
+        });
+
+    if (string.IsNullOrWhiteSpace(code))
+        return BadRequest(new { 
+            Success = false, 
+            Message = "Claim code is required." 
+        });
+
+    var order = await _db.Orders
+        .Include(o => o.OrderItems)
+        .ThenInclude(oi => oi.Book)
+        .FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
+
+    if (order == null)
+        return NotFound(new { 
+            Success = false, 
+            Message = "Order not found for this user" 
+        });
+
+    if (order.ClaimCode != code)
+        return BadRequest(new { 
+            Success = false, 
+            Message = "Claim code does not match" 
+        });
+
+    if (order.Status == "Completed")
+        return Conflict(new { 
+            Success = false, 
+            Message = "Order already completed" 
+        });
+        
+    if (order.Status == "Cancelled")
+        return Conflict(new { 
+            Success = false, 
+            Message = "Order already cancelled" 
+        });
+
+    order.Status = "Completed";
+    order.OrderDate = DateTime.UtcNow;
+
+    try
+    {
+        await _db.SaveChangesAsync();
+        
+        string subject = $"Invoice for Order #{order.OrderId} - Book Store Nepal";
+        string body = GenerateInvoiceEmail(user, order);
+
+        await _emailService.SendEmailAsync(user.Email, subject, body);
+
+        return Ok(new { 
+            Success = true,
+            OrderId = order.OrderId,
+            ClaimCode = order.ClaimCode,
+            CompletionDate = order.OrderDate,
+            Message = "Order completed and invoice sent."
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { 
+            Success = false, 
+            Error = ex.Message 
+        });
+    }
+}
+
+private string GenerateInvoiceEmail(Users user, Orders order)
+{
+    var itemsHtml = new StringBuilder();
+    foreach (var item in order.OrderItems)
+    {
+        itemsHtml.AppendLine($@"
+            <tr>
+                <td>{item.Book?.Title ?? "N/A"}</td>
+                <td>{item.Quantity}</td>
+                <td>NPR {item.UnitPrice:F2}</td>
+                <td>NPR {item.Quantity * item.UnitPrice:F2}</td>
+            </tr>");
+    }
+
+    return $@"
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; }}
+            .invoice {{ max-width: 800px; margin: 0 auto; }}
+            .header {{ text-align: center; margin-bottom: 20px; }}
+            .details {{ margin-bottom: 30px; }}
+            table {{ width: 100%; border-collapse: collapse; }}
+            th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+            th {{ background-color: #f2f2f2; }}
+            .total {{ font-weight: bold; text-align: right; }}
+            .footer {{ margin-top: 30px; font-style: italic; }}
+        </style>
+    </head>
+    <body>
+        <div class='invoice'>
+            <div class='header'>
+                <h2>Book Store Nepal</h2>
+                <h3>INVOICE</h3>
+                <p>Invoice #: {order.OrderId}</p>
+                <p>Date: {DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm")}</p>
+            </div>
+            
+            <div class='details'>
+                <p><strong>Customer:</strong> {user.Name}</p>
+                <p><strong>Email:</strong> {user.Email}</p>
+                <p><strong>Claim Code:</strong> {order.ClaimCode}</p>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {itemsHtml}
+                </tbody>
+            </table>
+            
+            <div class='total'>
+                <p>Subtotal: NPR {order.TotalPrice:F2}</p>
+                {(order.DiscountPercent.HasValue && order.DiscountPercent > 0 ? 
+                    $@"<p>Discount ({order.DiscountPercent}%): NPR {(order.TotalPrice * order.DiscountPercent.Value/100):F2}</p>
+                    <p>Grand Total: NPR {order.TotalPrice * (1 - order.DiscountPercent.Value/100):F2}</p>" 
+                    : $@"<p>Grand Total: NPR {order.TotalPrice:F2}</p>")}
+            </div>
+            
+            <div class='footer'>
+                <p>Thank you for your purchase!</p>
+                <p>Please present this claim code when collecting your order: <strong>{order.ClaimCode}</strong></p>
+            </div>
+        </div>
+    </body>
+    </html>";
+}
+
+[HttpDelete("deleteOrder/{orderId}")]
+public async Task<IActionResult> DeleteOrder(int orderId)
+{
+    try
+    {
+        // Find the order including its related items
+        var order = await _db.Orders
+            .Include(o => o.OrderItems)
+            .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+        if (order == null)
+        {
+            return NotFound(new { 
+                Success = false, 
+                Message = "Order not found" 
+            });
+        }
+
+        // Check if order can be deleted based on status
+        if (order.Status != "Completed")
+        {
+            return BadRequest(new {
+                Success = false,
+                Message = $"Cannot delete order with status: {order.Status}"
+            });
+        }
+
+        // First delete all order items
+        _db.OrderItems.RemoveRange(order.OrderItems);
+
+        // Then delete the order
+        _db.Orders.Remove(order);
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new {
+            Success = true,
+            Message = "Order deleted successfully",
+            DeletedOrderId = orderId
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new {
+            Success = false,
+            Message = "An error occurred while deleting the order",
+            Error = ex.Message
+        });
+    }
+}
+
     }
 }

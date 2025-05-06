@@ -48,6 +48,9 @@ const SignIn = () => {
 
           navigate('/admin/dashboard');
         }
+        else if(response?.data?.role==='staff'){
+          navigate('/staff/dashboard');
+        }
         else{
           navigate('/');
         }

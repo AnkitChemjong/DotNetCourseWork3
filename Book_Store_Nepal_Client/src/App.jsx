@@ -20,6 +20,8 @@ import UserOrders from './Pages/UserOrders';
 import { getAllOrder } from './Store/Slice/AllOrderSlice';
 import AllBooks from './Pages/AdminBookDetails';
 import UpdateBook from './Pages/UpdateBook';
+import StaffDashboard from './Pages/StaffDashboard';
+import StaffOrderList from './Pages/StaffOrderList';
 
 
 function AdminRoute({ children }) {
@@ -46,6 +48,28 @@ const PrivateRoute = ({ children }) => {
     if (user?.role==='admin') {
       return <Navigate to="/admin/dashboard" />;
     } else {
+      return children;
+    }
+  }
+  else{
+    return <Navigate to="/sign-in" />;
+  }
+}
+const StaffRoute = ({ children }) => {
+  const userStates = useSelector(state => state?.user);
+  const { data: user, loading } = userStates;
+
+  if (loading) {
+    return <CommonSkeleton />
+  }
+  if (user) {
+    if (user?.role==='admin') {
+      return <Navigate to="/admin/dashboard" />;
+    } 
+    else if(user?.role==='user'){
+     return <Navigate to='/'/>
+    }
+    else {
       return children;
     }
   }
@@ -106,6 +130,8 @@ if(!orderStates?.data){
         <Route path='/' element={<HomeRestrictForAdmin><Home/></HomeRestrictForAdmin>}/>
         <Route path='/sign-up' element={<AuthRoute><SignUp/></AuthRoute>}/>
         <Route path='/sign-in' element={<AuthRoute><SignIn/></AuthRoute>}/>
+        <Route path='/staff/dashboard' element={<StaffRoute><StaffDashboard/></StaffRoute>}/>
+        <Route path='/staff/orders' element={<StaffRoute><StaffOrderList/></StaffRoute>}/>
         <Route path='/books' element={<PrivateRoute><Book/></PrivateRoute>}/>
         <Route path='/cart' element={<PrivateRoute><Cart/></PrivateRoute>}/>
         <Route path='/book-details/:id' element={<PrivateRoute><BookDetails/></PrivateRoute>}/>

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookStoreNepalServer.Models;
 
@@ -27,9 +28,11 @@ public class Orders
 
      
         [Required]
+        [ForeignKey("User")]
         public int UserId { get; set; }
 
         
+
         public Users User { get; set; }
         public ICollection<OrderItem> OrderItems { get; set; }= new List<OrderItem>();
 
