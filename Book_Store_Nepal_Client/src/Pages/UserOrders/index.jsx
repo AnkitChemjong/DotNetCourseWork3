@@ -46,10 +46,10 @@ const UserOrders = () => {
     };
 
     return (
-        <div className="flex flex-col min-w-screen min-h-screen overflow-auto mt-10">
+        <div className="flex flex-col min-w-screen min-h-screen overflow-auto mt-20">
             <UserNavbar />
             <div className="flex-grow container mx-auto flex items-center justify-center p-4">
-                <div className="bg-white rounded-lg shadow overflow-hidden">
+                <div className="bg-white rounded-lg shadow overflow-auto max-h-96">
                     <div className="px-6 py-4 border-b border-gray-200">
                         <h1 className="text-2xl font-semibold text-gray-900">Your Orders</h1>
                     </div>
@@ -75,6 +75,9 @@ const UserOrders = () => {
                                         </th>
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Items
+                                        </th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Initial Price
                                         </th>
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Total
@@ -107,7 +110,10 @@ const UserOrders = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                ${order.totalPrice.toFixed(2)}
+                                                Rs.{order.initialPrice.toFixed(2)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                Rs.{order.totalPrice.toFixed(2)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
