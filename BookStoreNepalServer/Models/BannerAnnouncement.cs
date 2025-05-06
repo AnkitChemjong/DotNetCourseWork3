@@ -22,6 +22,6 @@ namespace BookStoreNepalServer.Models
         
         public int UserId { get; set; }
 
-        public Users User { get; set; }
+        public Users? User { get; set; }
     }
 }
