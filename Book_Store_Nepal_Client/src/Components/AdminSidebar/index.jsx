@@ -11,7 +11,6 @@ const AdminSidebar = () => {
   const navigate=useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  //navitem for the navigation
 
   const navItems = [
     {
