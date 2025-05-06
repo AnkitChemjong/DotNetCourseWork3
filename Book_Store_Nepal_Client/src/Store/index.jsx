@@ -4,6 +4,7 @@ import getAllBookSlice from './Slice/AllBookSlice';
 import getAllCartSlice from './Slice/AllCartSlice';
 import getAllMarkSlice from './Slice/GetAllBookMark';
 import getAllOrdersSlice from './Slice/AllOrderSlice';
+import getAllReviewSlice from './Slice/AllReviewSlice';
 
 const store=configureStore({
     reducer:{
@@ -11,8 +12,8 @@ const store=configureStore({
      books:getAllBookSlice,
      carts:getAllCartSlice,
      bookmarks:getAllMarkSlice,
-     orders:getAllOrdersSlice
-
+     orders:getAllOrdersSlice,
+     reviews:getAllReviewSlice
     }
 });
 export default store;

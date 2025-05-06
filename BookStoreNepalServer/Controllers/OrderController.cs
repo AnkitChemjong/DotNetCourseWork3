@@ -194,7 +194,7 @@ await _emailService.SendEmailAsync(user.Email, subject, body);
         {
             var order = await _db.Orders.FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
             if (order == null)
-                return NotFound();
+                return NotFound("Order not found.");
 
             // Only allow cancellation if the order has not been processed (i.e., status "Placed").
             if(order.Status != "Placed")

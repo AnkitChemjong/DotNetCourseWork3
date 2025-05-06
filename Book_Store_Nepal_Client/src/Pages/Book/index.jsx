@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiSearch, FiFilter, FiBookmark, FiShoppingCart, FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import { FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
+import { FaStar, FaRegStar } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import UserNavbar from '../../Components/UserNavbar';
 import Footer from '@/Components/Footer';
@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axiosService from '@/Services/Axios';
 import { getAllCart } from '@/Store/Slice/AllCartSlice';
 import { getAllMark } from '@/Store/Slice/GetAllBookMark';
+import renderStars from '@/Components/RenderStar';
 
 const BookPage = () => {
   const navigate = useNavigate();
@@ -18,6 +19,8 @@ const BookPage = () => {
   const { data: allBooks = [], loading } = bookState;
 const userState=useSelector(state=>state?.user);
 const {data:user}=userState;
+const reviewState=useSelector(state=>state?.reviews);
+const {data:allReview}=reviewState;
 const markState=useSelector(state=>state?.bookmarks);
 const {data:marks}=markState;
   // State management
@@ -196,26 +199,6 @@ const {data:marks}=markState;
     setSearchTerm('');
   };
 
-  // Render star rating
-  const renderStars = (rating) => {
-    if (!rating) return null;
-    
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    
-    for (let i = 1; i <= 5; i++) {
-      if (i <= fullStars) {
-        stars.push(<FaStar key={i} className="text-yellow-400 text-sm" />);
-      } else if (i === fullStars + 1 && hasHalfStar) {
-        stars.push(<FaStarHalfAlt key={i} className="text-yellow-400 text-sm" />);
-      } else {
-        stars.push(<FaRegStar key={i} className="text-yellow-400 text-sm" />);
-      }
-    }
-    
-    return stars;
-  };
 
   const handleNavigate = async(id) => {
     if (id) {
@@ -605,15 +588,22 @@ const {data:marks}=markState;
                           {book.title}
                         </h3>
                         <p className="text-gray-600 text-sm mb-2">{book.author}</p>
-                        {book.rating && (
+                        {allReview?.filter(item=>item?.bookId===book?.bookId)?.length>0 ? (
                           <div className="flex items-center mb-2">
                             <div className="flex">
-                              {renderStars(book.rating)}
+                              {renderStars(allReview?.filter(item=>item?.bookId===book?.bookId)?.reduce((sum, review) => sum + (review?.rating || 0), 0) /allReview?.filter(item=>item?.bookId===book?.bookId).length)}
                             </div>
-                            {book.reviews && book.reviews.length > 0 && (
-                              <span className="text-gray-500 text-xs ml-1">({book.reviews.length})</span>
+                            {allReview?.filter(item=>item?.bookId===book?.bookId)?.length > 0 && (
+                              <span className="text-gray-500 text-xs ml-1">({allReview?.filter(item=>item?.bookId===book?.bookId)?.length})</span>
                             )}
                           </div>
+                        ):(
+                          <div className="flex items-center mb-2">
+                            <div className="flex">
+                              {renderStars(0)}
+                            </div>
+                                <span className="text-gray-500 text-xs ml-1">0 Reviews</span>
+                            </div>
                         )}
                         <div className="mt-auto">
                           <div className="flex items-center justify-between">

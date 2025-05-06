@@ -94,7 +94,7 @@ const AllBooks = () => {
                         </button>
                         <button
                           onClick={() => handleDelete(book.bookId)}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                          className="bg-red-500 text-black px-3 py-1 rounded hover:bg-red-600"
                         >
                           Delete
                         </button>

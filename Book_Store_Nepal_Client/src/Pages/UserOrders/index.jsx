@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { getAllOrder } from '@/Store/Slice/AllOrderSlice';
 import { useDispatch } from 'react-redux';
 import axiosService from '@/Services/Axios';
+import Footer from '@/Components/Footer';
 
 const UserOrders = () => {
     const dispatch=useDispatch();
@@ -22,8 +23,10 @@ const UserOrders = () => {
         }
     }, [user, orderState]);
 
+
     const handleCancelOrder = async (orderId) => {
         try{
+            console.log(orderId)
             const response=await axiosService.patch(`/api/order/cancel/${orderId}/${user?.userId}`);
             console.log(response);
             if(response?.status===200){
@@ -43,7 +46,7 @@ const UserOrders = () => {
     };
 
     return (
-        <div className="flex flex-col min-w-screen min-h-screen">
+        <div className="flex flex-col min-w-screen min-h-screen overflow-auto mt-10">
             <UserNavbar />
             <div className="flex-grow container mx-auto flex items-center justify-center p-4">
                 <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -98,7 +101,7 @@ const UserOrders = () => {
                                                     {order.orderItems?.$values?.map((item, index) => (
                                                         <div key={index} className="flex items-center">
                                                             <span className="mr-2">•</span>
-                                                            <span>{item.productName || 'Unknown Item'} (Qty: {item.quantity})</span>
+                                                            <span>{item.book.title || 'Unknown Item'} (Qty: {item.quantity})</span>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -115,14 +118,19 @@ const UserOrders = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                {order.status === 'Placed' && (
+                            
+                                                   { order?.status==="Placed"?
                                                     <button
+                                                   
                                                         onClick={() => handleCancelOrder(order.orderId)}
-                                                        className="text-red-600 hover:text-red-900 font-medium"
+                                                        className="text-black hover:text-red-900 font-medium"
                                                     >
                                                         Cancel Order
-                                                    </button>
-                                                )}
+                                                    
+                                                    </button>:
+                                                    <p>N/A</p>
+                                                    }
+                                            
                                             </td>
                                         </tr>
                                     ))}
@@ -132,6 +140,7 @@ const UserOrders = () => {
                     )}
                 </div>
             </div>
+            <Footer/>
         </div>
     );
 };
