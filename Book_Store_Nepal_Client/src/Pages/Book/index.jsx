@@ -123,7 +123,8 @@ const {data:marks}=markState;
     );
 
     if (filters.rating > 0) {
-      filtered = filtered.filter(book => book.rating >= filters.rating);
+      filtered = filtered.filter(item=>allReview.filter(item2=>item2?.bookId===item?.bookId)?.
+        reduce((sum, review) => sum + (review?.rating || 0), 0) / filtered.filter(item3=>item3?.bookId===item?.bookId).length>=filters.rating)   
     }
 
     if (filters.language.length > 0) {
@@ -285,7 +286,7 @@ const {data:marks}=markState;
                   <div className="flex gap-2">
                     <button 
                       onClick={resetFilters}
-                      className="text-sm text-blue-600 hover:text-blue-800"
+                      className="text-sm text-black hover:text-blue-800"
                     >
                       Reset All
                     </button>
@@ -554,7 +555,7 @@ const {data:marks}=markState;
                 <p className="text-gray-500 mb-4">No books found matching your criteria.</p>
                 <button
                   onClick={resetFilters}
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                  className="px-4 py-2 bg-blue-600 text-black rounded hover:bg-blue-700 text-sm"
                 >
                   Reset Filters
                 </button>
