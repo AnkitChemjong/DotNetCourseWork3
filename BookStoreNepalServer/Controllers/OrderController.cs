@@ -48,7 +48,7 @@ public OrderController(DB db, EmailService emailService)
             UnitPrice = ci.Book.Price
         }).ToList();
 
-    
+        decimal initialPrice = orderItems.Sum(oi => oi.UnitPrice * oi.Quantity);
         decimal totalPrice = orderItems.Sum(oi => oi.UnitPrice * oi.Quantity);
         int totalBooks     = orderItems.Sum(oi => oi.Quantity);
 
@@ -69,7 +69,8 @@ public OrderController(DB db, EmailService emailService)
             TotalPrice      = finalPrice,
             DiscountPercent = discountPct,
             Status          = "Placed",
-            OrderDate       = DateTime.UtcNow
+            OrderDate       = DateTime.UtcNow,
+            InitialPrice    = initialPrice
         };
 
  
