@@ -7,12 +7,18 @@ import { useNavigate } from 'react-router-dom';
 const AllBooks = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate =useNavigate();
+
+  console.log("books",books);
 
   const fetchBooks = async () => {
     try {
       const response = await axiosService.get('/api/book/getAllBooks');
+
+      console.log("response data",response?.data);
       if (response?.status === 200) {
-        setBooks(response.data);
+        const vals = response.data.$values;
+        setBooks(Array.isArray(vals) ? vals : []);
       }
     } catch (error) {
       console.error('Error fetching books:', error);
@@ -44,7 +50,6 @@ const AllBooks = () => {
 
   const handleEdit = (bookId) => {
     navigate(`/admin/updatebook/${bookId}`);
-    alert(`Edit functionality for book ID ${bookId} is not implemented yet.`);
   };
 
   return (

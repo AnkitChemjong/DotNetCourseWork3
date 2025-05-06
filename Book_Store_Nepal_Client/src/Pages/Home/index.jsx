@@ -5,7 +5,7 @@ import { BsBookHalf } from 'react-icons/bs';
 import Footer from '@/Components/Footer';
 import { Button } from '@/Components/ui/button';
 import { categories } from '@/lib/utils';
-
+import SliderBanner from '@/Components/ui/banner';
 const Home = () => {
   // Dummy data for latest books
   const latestBooks = [
@@ -109,9 +109,21 @@ const Home = () => {
 
 
   return (
-    <div className="bg-white">
-      <UserNavbar />
  
+    <div className="bg-white">
+      <nav className="bg-white shadow-sm z-50 relative">
+      <UserNavbar />
+      </nav>
+
+ <div className="mt-16">
+      <SliderBanner/>
+
+
+     
+
+
+
+
       <section className="relative bg-blue-900 text-white py-32">
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="container mx-auto px-4 relative z-10 text-center">
@@ -236,10 +248,14 @@ const Home = () => {
           </form>
         </div>
       </section>
-      
+      </div>
+     
+  
       <Footer/>
     </div>
+
   );
+ 
 }
 
 export default Home;

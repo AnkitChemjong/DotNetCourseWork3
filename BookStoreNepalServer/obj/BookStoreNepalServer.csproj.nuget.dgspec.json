@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ASINGMENTS\\.net\\sem2\\Project\\BookStoreNepalServer\\BookStoreNepalServer.csproj": {}
+    "D:\\dotnetCW\\DotNetCourseWork3\\BookStoreNepalServer\\BookStoreNepalServer.csproj": {}
   },
   "projects": {
-    "D:\\ASINGMENTS\\.net\\sem2\\Project\\BookStoreNepalServer\\BookStoreNepalServer.csproj": {
+    "D:\\dotnetCW\\DotNetCourseWork3\\BookStoreNepalServer\\BookStoreNepalServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ASINGMENTS\\.net\\sem2\\Project\\BookStoreNepalServer\\BookStoreNepalServer.csproj",
+        "projectUniqueName": "D:\\dotnetCW\\DotNetCourseWork3\\BookStoreNepalServer\\BookStoreNepalServer.csproj",
         "projectName": "BookStoreNepalServer",
-        "projectPath": "D:\\ASINGMENTS\\.net\\sem2\\Project\\BookStoreNepalServer\\BookStoreNepalServer.csproj",
-        "packagesPath": "C:\\Users\\Ankit_Chemjong\\.nuget\\packages\\",
-        "outputPath": "D:\\ASINGMENTS\\.net\\sem2\\Project\\BookStoreNepalServer\\obj\\",
+        "projectPath": "D:\\dotnetCW\\DotNetCourseWork3\\BookStoreNepalServer\\BookStoreNepalServer.csproj",
+        "packagesPath": "C:\\Users\\niraj\\.nuget\\packages\\",
+        "outputPath": "D:\\dotnetCW\\DotNetCourseWork3\\BookStoreNepalServer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Ankit_Chemjong\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\niraj\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -99,24 +99,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.13, 8.0.13]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.13, 8.0.13]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.13, 8.0.13]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.13, 8.0.13]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -125,7 +107,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.200/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

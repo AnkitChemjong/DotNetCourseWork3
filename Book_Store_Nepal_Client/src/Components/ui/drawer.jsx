@@ -15,7 +15,7 @@ function DrawerTrigger({
   return <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />;
 }
 
-function DrawerPortal({
+function DrawerPortal({ 
   ...props
 }) {
   return <DrawerPrimitive.Portal data-slot="drawer-portal" {...props} />;
