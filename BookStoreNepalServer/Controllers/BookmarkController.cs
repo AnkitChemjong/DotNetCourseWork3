@@ -18,7 +18,7 @@ namespace BookStoreNepalServer.Controllers
         }
 
         [HttpPost("addBookMark")]
-public async Task<IActionResult> AddToCart([FromBody] Whitelist whitelist)
+public async Task<IActionResult> AddBookMark([FromBody] Whitelist whitelist)
 {
     await _db.Whitelists.AddAsync(whitelist);
     await _db.SaveChangesAsync();

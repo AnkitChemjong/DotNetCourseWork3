@@ -85,7 +85,7 @@ const UpdateBook = () => {
       const res = await axiosService.put(`/api/book/update/${id}`, book);
       if (res.status === 204) {
         alert('Book updated successfully');
-        navigate('/admin/books');
+        navigate('/admin/managebook');
       }
     } catch (error) {
       console.error('Error updating book:', error);
