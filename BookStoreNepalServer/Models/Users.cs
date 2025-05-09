@@ -7,7 +7,7 @@ public class Users
 {
         public Users()
     {
-        Role = "user"; // default value
+        Role = "user"; 
     }
 
      [Key]

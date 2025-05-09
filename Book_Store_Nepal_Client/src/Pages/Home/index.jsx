@@ -6,6 +6,7 @@ import Footer from '@/Components/Footer';
 import { Button } from '@/Components/ui/button';
 import { categories } from '@/lib/utils';
 import SliderBanner from '@/Components/ui/banner';
+import NotificationDisplay from '../NotificationDisplay/NotificationDisplay';
 const Home = () => {
   // Dummy data for latest books
   const latestBooks = [
@@ -121,7 +122,7 @@ const Home = () => {
 
      
 
-
+    {/* <NotificationDisplay/> */}
 
 
       <section className="relative bg-blue-900 text-white py-32">

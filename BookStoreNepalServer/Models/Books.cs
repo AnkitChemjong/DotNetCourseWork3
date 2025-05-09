@@ -16,6 +16,7 @@ public class Books
 
         [Required(ErrorMessage = "Author is required")]
         [MaxLength(50, ErrorMessage = "Author cannot exceed 50 characters")]
+        
         public string Author { get; set; }
 
         [Required(ErrorMessage = "ISBN is required")]
@@ -46,6 +47,7 @@ public class Books
 
         [Required(ErrorMessage = "Publisher name is required")]
         [MaxLength(50, ErrorMessage = "Publisher name cannot exceed 50 characters")]
+
         public string Publisher { get; set; } 
         [Required(ErrorMessage = "coverImage name is required")]
         public string coverImage { get; set; } 
@@ -57,7 +59,7 @@ public class Books
         public double? Rating { get; set; }  
 
         public bool IsOnSale { get; set; } = false;
-
+        
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
          public ICollection<Cart> Carts { get; set; } = new List<Cart>();
          [InverseProperty("Book")]

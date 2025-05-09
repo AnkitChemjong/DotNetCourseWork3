@@ -19,7 +19,6 @@ public class EmailService
         email.To.Add(MailboxAddress.Parse(toEmail));
         email.Subject = subject;
         email.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = htmlBody };
-
         using var smtp = new SmtpClient();
         await smtp.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
         await smtp.AuthenticateAsync(_smtpSettings.Email, _smtpSettings.Password);

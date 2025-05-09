@@ -18,7 +18,6 @@ public class Whitelist
         [ForeignKey("Book")]
         public int BookId { get; set; }
 
-        // Navigation
         public Users? User { get; set; }
         [InverseProperty("WhiteLists")]
         public Books? Book { get; set; }

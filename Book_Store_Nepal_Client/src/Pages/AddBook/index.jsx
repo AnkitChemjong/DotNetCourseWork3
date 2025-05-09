@@ -34,7 +34,7 @@ const AddBook = () => {
         const {value,files,name}=e.target;
         const formData=new FormData();
         formData.append('file',files[0]);
-        formData.append('upload_preset',import.meta.env.VITE_CLOUD_PRESET);
+        formData.append('upload_preset',import.meta.env.VITE_CLOUD_PRESET); 
         formData.append('cloud_name',import.meta.env.VITE_CLOUD_NAME);
         const response=await axios.post(import.meta.env.VITE_CLOUD_BASE_URL,formData);
         if(response?.status===200){

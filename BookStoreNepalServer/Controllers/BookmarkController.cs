@@ -48,5 +48,6 @@ public async Task<ActionResult<IEnumerable<Whitelist>>> GetAllMark()
             await _db.SaveChangesAsync();
             return Ok("Deleted Successfully.");
         }
+        
     }
 }

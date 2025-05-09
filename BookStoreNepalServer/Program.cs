@@ -5,6 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BookStoreNepalServer.Services.Email;
 
+using BookStoreNepalServer.Hubs;
+using BookStoreNepalServer.Services.Notification;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DB>(options =>
@@ -13,6 +16,11 @@ builder.Services.AddDbContext<DB>(options =>
 builder.Services.Configure<SmtpSettings>(
     builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddTransient<EmailService>();
+
+builder.Services.AddSignalR();
+builder.Services.AddScoped<NotificationService>();
+
+
 
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
@@ -70,6 +78,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthentication();
+// app.MapHub<NotificationHub>("/notificationHub");
+
+app.MapHub<NotificationHub>("/notificationHub");
 app.UseCors("AllowReactApp");
 app.UseHttpsRedirection();
 app.UseAuthorization();
