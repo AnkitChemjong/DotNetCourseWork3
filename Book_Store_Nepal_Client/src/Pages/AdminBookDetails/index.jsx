@@ -9,6 +9,7 @@ import { getAllBook } from '@/Store/Slice/AllBookSlice';
 import ConfirmDialog from '@/Components/ConfirmDialog';
 
 
+
 const AllBooks = () => {
   const [loading, setLoading] = useState(true);
   const bookState=useSelector(state=>state?.books);
@@ -51,12 +52,12 @@ const AllBooks = () => {
       try {
         const response = await axiosService.delete(`/api/book/delete/${bookId}`);
         if (response?.status === 200) {
-          alert(response?.data?.message || 'Book deleted');
+          toast.success(response?.data?.message || 'Book deleted');
           dispatch(getAllBook());
         }
       } catch (error) {
         console.error('Error deleting book:', error);
-        alert(error?.response?.data || 'Delete failed');
+        toast.error(error?.response?.data || 'Delete failed');
       }
     }
   };

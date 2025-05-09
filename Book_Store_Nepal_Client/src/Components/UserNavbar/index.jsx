@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosService from '@/Services/Axios';
 import { getUser } from '@/Store/Slice/UserSlice';
 import { FaCartShopping } from "react-icons/fa6";
+import { toast } from 'sonner';
 
 const UserNavbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -48,13 +49,13 @@ const UserNavbar = () => {
             const response=await axiosService.get('/api/user/logout');
             if(response?.status===200){
                 dispatch(getUser());
-                alert(response?.data?.message);
+                toast.success(response?.data?.message);
                 navigate('/sign-in');
             }
         }
         catch(error){
             console.log(error);
-            alert(error?.message);
+            toast.error(error?.message);
         }
     };
     useEffect(() => {

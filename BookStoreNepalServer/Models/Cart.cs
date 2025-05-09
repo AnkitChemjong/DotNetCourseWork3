@@ -9,11 +9,11 @@ public class Cart
      [Key]
    public int CartId {get;set;}
 [Required]
-      public int OriginalPrice {get;set;}
+      public decimal OriginalPrice {get;set;}
       [Required]
-      public int DiscountedPrice {get;set;}
+      public decimal DiscountedPrice {get;set;}
       [Required]
-      public int Discount {get;set;}
+      public decimal Discount {get;set;}
 
    [Required]
    

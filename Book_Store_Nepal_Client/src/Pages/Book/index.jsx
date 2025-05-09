@@ -244,7 +244,7 @@ const {data:marks}=markState;
 
       const userMarks=marks?.find(item=>item?.userId===user?.userId&&item?.book?.bookId===data?.bookId);
       if(userMarks){
-          alert("Book Already bookmarked");
+          toast.info("Book Already bookmarked");
       }
       else{
         const finalData={userId:user?.userId,bookId:data?.bookId};
@@ -252,7 +252,7 @@ const {data:marks}=markState;
         // console.log(response);
         if(response?.status===200){
           dispatch(getAllMark());
-          alert(response?.data?.message);
+          toast.success(response?.data?.message);
         }
       }
 

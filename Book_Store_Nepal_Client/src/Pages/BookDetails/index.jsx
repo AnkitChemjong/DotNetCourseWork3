@@ -123,7 +123,7 @@ const BookDetails = () => {
     try{
       const userMarks=marks?.find(item=>item?.userId===user?.userId&&item?.book?.bookId===data?.bookId);
       if(userMarks){
-        alert("Book already Bookmarked.")
+        toast.info("Book already Bookmarked.")
       }
       else{
 
@@ -132,7 +132,7 @@ const BookDetails = () => {
         // console.log(response);
         if(response?.status===200){
         dispatch(getAllMark());
-          alert(response?.data?.message);
+          toast.success(response?.data?.message);
         }
       }
     }

@@ -4,6 +4,7 @@ import { FaThLarge, FaBookMedical, FaSignOutAlt } from 'react-icons/fa';
 import { getUser } from '@/Store/Slice/UserSlice';
 import { useDispatch } from 'react-redux';
 import axiosService from '@/Services/Axios';
+import { toast } from 'sonner';
 
 const AdminSidebar = () => {
   const location = useLocation();
@@ -35,13 +36,13 @@ const AdminSidebar = () => {
         const response=await axiosService.get('/api/user/logout');
         if(response?.status===200){
             dispatch(getUser());
-            alert(response?.data?.message);
+            toast.success(response?.data?.message);
             navigate('/sign-in');
         }
     }
     catch(error){
         console.log(error);
-        alert(error?.message);
+        toast.error(error?.message);
     }
 
 };

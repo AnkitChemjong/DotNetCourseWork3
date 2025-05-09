@@ -8,6 +8,7 @@ import { categories } from '@/lib/utils';
 import SliderBanner from '@/Components/SliderBanner/banner';
 import { useSelector } from 'react-redux';
 import renderStars from '@/Components/RenderStar';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 const Home = () => {
   const navigate=useNavigate();
@@ -46,7 +47,7 @@ const Home = () => {
             navigate(`/book-details/${bookId}`);
       }
       else{
-        alert("Become Member first.")
+        toast.info("Become Member first.")
         navigate('/sign-in');
       }
     }
@@ -144,8 +145,27 @@ const Home = () => {
             <h3 className="text-lg font-semibold text-gray-800 truncate">{book.title}</h3>
             <p className="text-gray-600 text-sm">{book.author}</p>
             <div className="flex items-center mt-2">
-              {/* Rating code remains the same */}
-            </div>
+  <div className="flex">
+    {book?.reviews?.$values?.length > 0 ? (
+      <>
+        {renderStars(
+          book.reviews.$values.reduce((sum, review) => sum + (review?.rating || 0), 0) / 
+          book.reviews.$values.length
+        )}
+        <span className="text-gray-500 text-xs ml-1">
+          ({book.reviews.$values.length} {book.reviews.$values.length === 1 ? 'review' : 'reviews'})
+        </span>
+      </>
+    ) : (
+      <>
+        {renderStars(0)} {/* This will show 5 empty stars */}
+        <span className="text-gray-500 text-xs ml-1">
+          (0 reviews)
+        </span>
+      </>
+    )}
+  </div>
+</div>
             
             {/* Price with discount */}
             <div className="mt-2">
@@ -192,8 +212,27 @@ const Home = () => {
             <h3 className="text-lg font-semibold text-gray-800 truncate">{book.title}</h3>
             <p className="text-gray-600 text-sm">{book.author}</p>
             <div className="flex items-center mt-2">
-              {/* Rating code remains the same */}
-            </div>
+  <div className="flex">
+    {book?.reviews?.$values?.length > 0 ? (
+      <>
+        {renderStars(
+          book.reviews.$values.reduce((sum, review) => sum + (review?.rating || 0), 0) / 
+          book.reviews.$values.length
+        )}
+        <span className="text-gray-500 text-xs ml-1">
+          ({book.reviews.$values.length} {book.reviews.$values.length === 1 ? 'review' : 'reviews'})
+        </span>
+      </>
+    ) : (
+      <>
+        {renderStars(0)} 
+        <span className="text-gray-500 text-xs ml-1">
+          (0 reviews)
+        </span>
+      </>
+    )}
+  </div>
+</div>
             
             {/* Price with discount */}
             <div className="mt-2">
