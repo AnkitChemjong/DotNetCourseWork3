@@ -4,6 +4,7 @@ using BookStoreNepalServer.Models;
 using BookStoreNepalServer.Database;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using BookStoreNepalServer.DTO;
 
 namespace BookStoreNepalServer.Controllers
 {
@@ -66,8 +67,9 @@ namespace BookStoreNepalServer.Controllers
         [HttpGet("getAllBooks")]
 public async Task<ActionResult<IEnumerable<Books>>> GetAllBooks()
 {
-    var books = await _db.Books.ToListAsync();
-
+    var books = await _db.Books
+    .Include(b => b.Reviews)
+    .ToListAsync();
     if (books == null || books.Count == 0)
     {
         return NoContent(); 
@@ -162,6 +164,81 @@ public async Task<ActionResult<IEnumerable<Books>>> GetAllBooks()
             _db.Books.Remove(book);
             await _db.SaveChangesAsync();
             return NoContent();
+        }
+
+        [HttpPatch("update-discount")]
+public async Task<IActionResult> UpdateDiscount([FromBody] UpdateDiscountRequest request)
+{
+    if (request.DiscountStartDate >= request.DiscountEndDate)
+    {
+        return BadRequest("Discount end date must be after the start date.");
+    }
+
+    var book = await _db.Books.FindAsync(request.BookId);
+    if (book == null)
+    {
+        return NotFound("Book not found.");
+    }
+
+    // Check if book is out of stock
+    if (book.Stock <= 0)
+    {
+        return BadRequest("Cannot apply discount - book is out of stock.");
+    }
+
+    // Check if book is marked as on sale
+    if (!book.IsOnSale)
+    {
+        return BadRequest("Cannot apply discount - book is not marked for sale.");
+    }
+
+    // Update the book's discount information
+    book.Discount = request.Discount;
+    book.DiscountStartDate = request.DiscountStartDate;
+    book.DiscountEndDate = request.DiscountEndDate;
+    
+    try
+    {
+        _db.Books.Update(book);
+        await _db.SaveChangesAsync();
+
+        return Ok(new { 
+            message = "Discount updated successfully.", 
+            book = new {
+                book.BookId,
+                book.Title,
+                book.Discount,
+                DiscountStartDate = book.DiscountStartDate.ToString("yyyy-MM-dd"),
+                DiscountEndDate = book.DiscountEndDate.ToString("yyyy-MM-dd"),
+                book.IsOnSale,
+                book.Stock
+            }
+        });
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, $"An error occurred while updating discount: {ex.Message}");
+    }
+}
+       
+
+       [HttpPatch("end-discount")]
+        public async Task<IActionResult> EndDiscount([FromBody] EndDiscountRequest request)
+        {
+            var book = await _db.Books.FindAsync(request.BookId);
+            if (book == null)
+            {
+                return NotFound("Book not found.");
+            }
+
+            // End the discount by setting Discount to 0 and setting the DiscountEndDate to the current date
+            book.Discount = 0;
+            book.DiscountEndDate = DateTime.UtcNow;
+
+            _db.Books.Update(book);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "Discount ended successfully.", book });
         }
 
 

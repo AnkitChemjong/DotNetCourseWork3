@@ -11,6 +11,8 @@ import axiosService from '@/Services/Axios';
 import { getAllCart } from '@/Store/Slice/AllCartSlice';
 import { getAllMark } from '@/Store/Slice/GetAllBookMark';
 import renderStars from '@/Components/RenderStar';
+import { toast } from 'sonner';
+import { getAllBook } from '@/Store/Slice/AllBookSlice';
 
 const BookPage = () => {
   const navigate = useNavigate();
@@ -19,8 +21,6 @@ const BookPage = () => {
   const { data: allBooks = [], loading } = bookState;
 const userState=useSelector(state=>state?.user);
 const {data:user}=userState;
-const reviewState=useSelector(state=>state?.reviews);
-const {data:allReview}=reviewState;
 const markState=useSelector(state=>state?.bookmarks);
 const {data:marks}=markState;
   // State management
@@ -123,8 +123,8 @@ const {data:marks}=markState;
     );
 
     if (filters.rating > 0) {
-      filtered = filtered.filter(item=>allReview.filter(item2=>item2?.bookId===item?.bookId)?.
-        reduce((sum, review) => sum + (review?.rating || 0), 0) / filtered.filter(item3=>item3?.bookId===item?.bookId).length>=filters.rating)   
+      filtered = filtered.filter(item=>item?.reviews?.$values?.
+        reduce((sum, review) => sum + (review?.rating || 0), 0) / item?.reviews?.$values?.length>=filters.rating)   
     }
 
     if (filters.language.length > 0) {
@@ -207,26 +207,38 @@ const {data:marks}=markState;
     }
   }
 
-  const handleAddToCart=async(data)=>{
-    try{
-      const finalData={totalItems:1,cartTotal:Number(data?.price),userId:user?.userId,bookId:data?.bookId};
-      if(Number(data?.stock)>=1){
-        const response=await axiosService.post('/api/cart/addToCart',finalData);
-        console.log(response);
-        if(response?.status===200){
+  const handleAddToCart = async (data) => {
+    try {
+      // Calculate the actual price (considering discount if applicable)
+      const currentPrice = data.discount > 0
+        ? data.price * (1 - data.discount / 100)
+        : data.price;
+  
+      const finalData = {
+        totalItems: 1,  // Quantity is always 1
+        cartTotal: Number(currentPrice),  // Price for single item
+        userId: user?.userId,
+        bookId: data?.bookId,
+        originalPrice: data.price,  // Include original price
+        discount: data.discount,    // Include discount percentage
+        discountedPrice: currentPrice  // Include the actual price being charged
+      };
+  
+      if (data?.stock >= 1) {  // Check if at least 1 item is in stock
+        const response = await axiosService.post('/api/cart/addToCart', finalData);
+        if (response?.status === 200) {
           dispatch(getAllCart());
-          alert(response?.data?.message);
+          dispatch(getAllBook());
+          toast.success(response?.data?.message || "Added to cart successfully");
         }
+      } else {
+        toast.error("This item is out of stock");
       }
-      else{
-        alert("Book is out of stock");
-      }
-
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error(error.response?.data?.message || "Failed to add to cart");
     }
-    catch(error){
-      console.log(error);
-    }
-  }
+  };
   const handleBookMark=async(data)=>{
     try{
 
@@ -563,78 +575,103 @@ const {data:marks}=markState;
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {currentBooks.map(book => (
-                    <div 
-                      key={book.bookId}  
-                      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg transition duration-300 flex flex-col h-full"
-                    >
-                      <div className="relative">
-                        <img 
-                          src={book.coverImage} 
-                          alt={book.title} 
-                          className="w-full h-48 sm:h-56 object-cover"
-                          loading="lazy"
-                        />
-                        {book.isOnSale && (
-                          <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
-                            SALE
-                          </div>
-                        )}
-                        <button onClick={()=>handleBookMark(book)} className="absolute top-2 left-2 p-2 bg-white rounded-full text-black shadow hover:bg-gray-100">
-                          <FiBookmark className="text-gray-600" />
-                        </button>
-                      </div>
-                      <div className="p-4 flex-grow flex flex-col">
-                        <h3 className="font-semibold text-lg mb-1 line-clamp-2" title={book.title}>
-                          {book.title}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-2">{book.author}</p>
-                        {allReview?.filter(item=>item?.bookId===book?.bookId)?.length>0 ? (
-                          <div className="flex items-center mb-2">
-                            <div className="flex">
-                              {renderStars(allReview?.filter(item=>item?.bookId===book?.bookId)?.reduce((sum, review) => sum + (review?.rating || 0), 0) /allReview?.filter(item=>item?.bookId===book?.bookId).length)}
-                            </div>
-                            {allReview?.filter(item=>item?.bookId===book?.bookId)?.length > 0 && (
-                              <span className="text-gray-500 text-xs ml-1">({allReview?.filter(item=>item?.bookId===book?.bookId)?.length})</span>
-                            )}
-                          </div>
-                        ):(
-                          <div className="flex items-center mb-2">
-                            <div className="flex">
-                              {renderStars(0)}
-                            </div>
-                                <span className="text-gray-500 text-xs ml-1">0 Reviews</span>
-                            </div>
-                        )}
-                        <div className="mt-auto">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className="font-bold">Rs {book.price.toFixed(2)}</span>
-                            </div>
-                            <button onClick={()=>handleAddToCart(book)} className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-black text-sm rounded hover:bg-blue-700 transition-colors">
-                              <FiShoppingCart size={14} />
-                              <span>Add</span>
-                            </button>
-                            <button onClick={() => handleNavigate(book.bookId)} className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-black text-sm rounded hover:bg-blue-700 transition-colors">
-                    
-                              <span className='text-sm'>View Details</span>
-                            </button>
-                          </div>
-                          <div className="mt-2 flex flex-wrap gap-1 text-xs text-gray-500">
-                            {book.stock > 0 ? (
-                              <span className="bg-green-100 text-green-800 px-2 py-1 rounded">In Stock ({book.stock})</span>
-                            ) : (
-                              <span className="bg-red-100 text-red-800 px-2 py-1 rounded">Out of Stock</span>
-                            )}
-                            {book.genre && (
-                              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{book.genre}</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+  {currentBooks.map(book => (
+    <div 
+      key={book.bookId}  
+      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:scale-105 hover:shadow-lg transition duration-300 flex flex-col h-full relative"
+    >
+      {/* Discount Banner - Top Center */}
+      {book.discount > 0 && new Date(book.discountEndDate) > new Date() && (
+        <div className="absolute top-0 left-0 right-0 bg-red-600 text-white text-center py-1 text-sm font-bold">
+          <div className="flex justify-center items-center gap-2">
+            <span>{book.discount}% OFF</span>
+            <span className="text-xs font-normal">
+              ({new Date(book.discountStartDate).toLocaleDateString()} - {new Date(book.discountEndDate).toLocaleDateString()})
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="relative pt-8"> {/* Added padding to account for discount banner */}
+        <img 
+          src={book.coverImage} 
+          alt={book.title} 
+          className="w-full h-48 sm:h-56 object-cover"
+          loading="lazy"
+        />
+        
+        {book.isOnSale && (
+          <div className="absolute top-8 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
+            SALE
+          </div>
+        )}
+        
+        <button onClick={()=>handleBookMark(book)} className="absolute top-8 left-2 p-2 bg-white rounded-full text-black shadow hover:bg-gray-100">
+          <FiBookmark className="text-gray-600" />
+        </button>
+      </div>
+      
+      <div className="p-4 flex-grow flex flex-col">
+        <h3 className="font-semibold text-lg mb-1 line-clamp-2" title={book.title}>
+          {book.title}
+        </h3>
+        <p className="text-gray-600 text-sm mb-2">{book.author}</p>
+        
+        {book?.reviews?.$values?.length>0 ? (
+          <div className="flex items-center mb-2">
+            <div className="flex">
+              {renderStars(book?.reviews?.$values?.reduce((sum, review) => sum + (review?.rating || 0), 0) / book?.reviews?.$values?.length)}
+            </div>
+            <span className="text-gray-500 text-xs ml-1">{book?.reviews?.$values?.length} Reviews</span>
+          </div>
+        ):(
+          <div className="flex items-center mb-2">
+            <div className="flex">
+              {renderStars(0)}
+            </div>
+            <span className="text-gray-500 text-xs ml-1">0 Reviews</span>
+          </div>
+        )}
+        
+        <div className="mt-auto">
+          <div className="flex items-center justify-between">
+            <div>
+              {book.discount > 0 && new Date(book.discountEndDate) > new Date() ? (
+                <div>
+                  <span className="text-gray-500 line-through text-sm">Rs {book.price.toFixed(2)}</span>
+                  <span className="font-bold text-red-600 block">Rs {(book.price * (1 - book.discount/100)).toFixed(2)}</span>
                 </div>
+              ) : (
+                <span className="font-bold">Rs {book.price.toFixed(2)}</span>
+              )}
+            </div>
+            
+            <div className="flex gap-2">
+              <button onClick={()=>handleAddToCart(book)} className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-black text-sm rounded hover:bg-blue-700 transition-colors">
+                <FiShoppingCart size={14} />
+                <span>Add</span>
+              </button>
+              <button onClick={() => handleNavigate(book.bookId)} className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-black text-sm rounded hover:bg-blue-700 transition-colors">
+                <span className='text-sm'>Details</span>
+              </button>
+            </div>
+          </div>
+          
+          <div className="mt-2 flex flex-wrap gap-1 text-xs text-gray-500">
+            {book.stock > 0 ? (
+              <span className="bg-green-100 text-green-800 px-2 py-1 rounded">In Stock ({book.stock})</span>
+            ) : (
+              <span className="bg-red-100 text-red-800 px-2 py-1 rounded">Out of Stock</span>
+            )}
+            {book.genre && (
+              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{book.genre}</span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
 
                 {/* Pagination */}
                 {totalPages > 1 && (

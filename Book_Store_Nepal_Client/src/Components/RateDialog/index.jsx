@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import axiosService from '@/Services/Axios';
 import { useDispatch } from 'react-redux';
 import { getAllReview } from '@/Store/Slice/AllReviewSlice';
+import { getAllBook } from '@/Store/Slice/AllBookSlice';
 
 const RateDialog = ({ toggleDialog, setToggleDialog, userId, bookId }) => {
   const [rating, setRating] = useState(0);
@@ -25,6 +26,7 @@ const RateDialog = ({ toggleDialog, setToggleDialog, userId, bookId }) => {
      if(response?.status===200){
          alert(response?.data);
          setToggleDialog(false);
+         dispatch(getAllBook());
          dispatch(getAllReview());
      }
     } catch (error) {

@@ -8,6 +8,13 @@ public class Cart
 {
      [Key]
    public int CartId {get;set;}
+[Required]
+      public int OriginalPrice {get;set;}
+      [Required]
+      public int DiscountedPrice {get;set;}
+      [Required]
+      public int Discount {get;set;}
+
    [Required]
    
     public int TotalItems { get; set; }  

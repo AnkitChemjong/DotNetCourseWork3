@@ -2,34 +2,48 @@ import React, { useEffect, useState } from 'react';
 import AdminSidebar from '@/Components/AdminSidebar';
 import axiosService from '@/Services/Axios';
 import { useNavigate } from 'react-router-dom';
+import AddDiscount from '@/Components/AddDiscount';
+import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllBook } from '@/Store/Slice/AllBookSlice';
+import ConfirmDialog from '@/Components/ConfirmDialog';
 
 
 const AllBooks = () => {
-  const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const bookState=useSelector(state=>state?.books);
+  const {data:allBook}=bookState;
+  const userState=useSelector(state=>state?.user);
+  const {data:user}=userState;
   const navigate =useNavigate();
+  const [handleDialog,setHandleDialog]=useState(false);
+  const [toggleDialog,setToggleDialog]=useState(false);
+  const [tempBookId,setTempBookId]=useState(null);
+  const [bookIdToUpdate,setBookIdToUpdate]=useState(null);
+  const dispatch=useDispatch();
 
-  console.log("books",books);
-
-  const fetchBooks = async () => {
-    try {
-      const response = await axiosService.get('/api/book/getAllBooks');
-
-      console.log("response data",response?.data);
-      if (response?.status === 200) {
-        const vals = response.data.$values;
-        setBooks(Array.isArray(vals) ? vals : []);
-      }
-    } catch (error) {
-      console.error('Error fetching books:', error);
-    } finally {
+  useEffect(()=>{
+    if(allBook||allBook?.length>0){
       setLoading(false);
     }
-  };
+  },[allBook,user]);
 
-  useEffect(() => {
-    fetchBooks();
-  }, []);
+  const removeDiscount=async(bookId)=>{
+    try{
+      const response=await axiosService.patch('/api/book/end-discount',{bookId});
+      if(response?.status>=200 && response?.status<300){
+
+         dispatch(getAllBook());
+         setToggleDialog(false);
+         toast.success(response?.data?.message);
+      }
+
+    }
+    catch(error){
+      toast.error(error?.response?.data);
+      console.log(error);
+    }
+  }
 
 
   const handleDelete = async (bookId) => {
@@ -38,7 +52,7 @@ const AllBooks = () => {
         const response = await axiosService.delete(`/api/book/delete/${bookId}`);
         if (response?.status === 200) {
           alert(response?.data?.message || 'Book deleted');
-          fetchBooks(); 
+          dispatch(getAllBook());
         }
       } catch (error) {
         console.error('Error deleting book:', error);
@@ -62,7 +76,7 @@ const AllBooks = () => {
           <h2 className="text-2xl font-bold text-indigo-600 mb-6">All Books</h2>
           {loading ? (
             <p>Loading...</p>
-          ) : books.length === 0 ? (
+          ) : allBook.length === 0 ? (
             <p>No books found.</p>
           ) : (
             <div className="overflow-x-auto">
@@ -73,17 +87,19 @@ const AllBooks = () => {
                     <th className="px-4 py-2 border">Author</th>
                     <th className="px-4 py-2 border">ISBN</th>
                     <th className="px-4 py-2 border">Price</th>
+                    <th className="px-4 py-2 border">Discount</th>
                     <th className="px-4 py-2 border">Stock</th>
                     <th className="px-4 py-2 border">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {books.map((book) => (
+                  {allBook.map((book) => (
                     <tr key={book.bookId} className="hover:bg-gray-50">
                       <td className="px-4 py-2 border">{book.title}</td>
                       <td className="px-4 py-2 border">{book.author}</td>
                       <td className="px-4 py-2 border">{book.isbn}</td>
                       <td className="px-4 py-2 border">${book.price}</td>
+                      <td className="px-4 py-2 border">{book.discount} %</td>
                       <td className="px-4 py-2 border">{book.stock}</td>
                       <td className="px-4 py-2 border">
                         <button
@@ -94,10 +110,49 @@ const AllBooks = () => {
                         </button>
                         <button
                           onClick={() => handleDelete(book.bookId)}
-                          className="bg-red-500 text-black px-3 py-1 rounded hover:bg-red-600"
+                          className="bg-red-500 text-black px-3 py-1 rounded hover:bg-red-600 mr-2"
                         >
                           Delete
                         </button>
+                        {
+                          book?.discount>0 ? 
+                          (
+                            <>
+                            <button
+                            onClick={() =>{setToggleDialog(true)
+                              setTempBookId(book?.bookId)
+                            }}
+                            className="bg-red-500 text-black px-3 py-1 rounded hover:bg-red-600"
+                          >
+                            Remove Discount
+                          </button>
+                          {
+                            toggleDialog && 
+                            <ConfirmDialog toggleDialog={toggleDialog} setToggleDialog={setToggleDialog}
+                            title="Do you want to Remove Discount?"  func={()=>removeDiscount(tempBookId)} />
+                          }
+                            </>
+
+                          ):(
+                            <>
+                            <button
+                            onClick={() =>{
+                              setHandleDialog(true);
+                              setBookIdToUpdate(book.bookId);
+                            } }
+                            className="bg-red-500 text-black px-3 py-1 rounded hover:bg-red-600"
+                          >
+                            Add Discount
+                          </button>
+                          {
+                            handleDialog && 
+                            <AddDiscount  handleDialog={handleDialog} setHandleDialog={setHandleDialog} BookId={bookIdToUpdate}/>
+                          }
+                            </>
+
+                          )
+                        }
+                       
                       </td>
                     </tr>
                   ))}

@@ -12,3 +12,9 @@ export const categories = [
   "Fantasy", "Biography", "History", "Romance", 
   "Self-Help", "Children's Books", "Cookbooks", "Poetry"
 ];
+
+export const discountData={
+  discount:"",
+  discountStartDate:"",
+  discountEndDate:""
+}

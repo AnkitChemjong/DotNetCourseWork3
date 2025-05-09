@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
   const cartState = useSelector(state => state?.carts);
-  const { data: cartData = [] } = cartState;
+  const { data: cartData} = cartState;
   const userState = useSelector(state => state?.user);
   const { data: user } = userState;
   const dispatch=useDispatch();
@@ -30,7 +30,7 @@ const Cart = () => {
   const [loading1,setLoading1]=useState(false);
   const [loading2,setLoading2]=useState(false);
   const navigate=useNavigate();
-
+  console.log(cartData)
 
   useEffect(()=>{
     if(user){
@@ -120,6 +120,8 @@ const Cart = () => {
                   <TableHead className="w-[100px]">Cart ID</TableHead>
                   <TableHead>Items</TableHead>
                   <TableHead>Unit Price</TableHead>
+                  <TableHead> Discount</TableHead>
+                  <TableHead>Discounted Price</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -130,7 +132,9 @@ const Cart = () => {
                   <TableRow key={cart.cartId}>
                     <TableCell className="font-medium">{cart.cartId}</TableCell>
                     <TableCell>{cart.book.title}-{cart.totalItems}</TableCell>
-                    <TableCell>Rs {Number(cart.cartTotal)/Number(cart.totalItems)}</TableCell>
+                    <TableCell>Rs {Number(cart.cartTotal)/Number(cart.totalItems) || cart.originalPrice}</TableCell>
+                    <TableCell> {cart.discount} %</TableCell>
+                    <TableCell>Rs {cart.discountedPrice||0}</TableCell>
                     <TableCell>Rs {cart.cartTotal.toFixed(2)}</TableCell>
                     <TableCell>
                       {new Date(cart.createdAt).toLocaleDateString()}

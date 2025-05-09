@@ -29,7 +29,7 @@ public async Task<IActionResult> AddToCart([FromBody] Cart cart)
 public async Task<ActionResult<IEnumerable<Cart>>> GetAllCarts()
 {
     var carts = await _db.Carts
-        .Include(c => c.Book) // Include the Book navigation property
+        .Include(c => c.Book) 
         .ToListAsync();
 
     if (carts == null || carts.Count == 0)
