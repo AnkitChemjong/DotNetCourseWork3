@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams,useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiShoppingCart, FiBookmark, FiShare2, FiChevronDown, FiChevronUp } from 'react-icons/fi';
-import { FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
 import UserNavbar from '@/Components/UserNavbar';
 import Footer from '@/Components/Footer';
 import {
@@ -14,18 +13,60 @@ import {
 import axiosService from '@/Services/Axios';
 import { getAllCart } from '@/Store/Slice/AllCartSlice';
 import { getAllMark } from '@/Store/Slice/GetAllBookMark';
-
+import RateDialog from '@/Components/RateDialog';
+import renderStars from '@/Components/RenderStar';
 const BookDetails = () => {
   const userState=useSelector(state=>state?.user);
   const {data:user}=userState;
   const markState=useSelector(state=>state?.bookmarks);
   const {data:marks}=markState;
+  const orderState=useSelector(state=>state?.orders);
+  const {data:allOrders}=orderState;
+  const reviewState=useSelector(state=>state?.reviews);
+  const {data:allReviews}=reviewState;
   const dispatch=useDispatch();
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate=useNavigate();
+  const [userCompletedOrders,setUserCompletedOrders]=useState([]);
+  const [checkReview,setCheckReview]=useState(false);
+  const [isDialogOpen,setIsDialogOpen]=useState(false);
+  const [userBookReview,setUserBookReview]=useState(false);
+  const [bookReview,setBookReview]=useState([]);
+
+  useEffect(()=>{
+    if(user && book && allReviews?.length>0){
+      const data=allReviews?.find(item=>item?.bookId===book?.bookId&&item?.userId===user?.userId);
+      const bookData=allReviews?.filter(item=>item?.bookId===book?.bookId);
+      if(bookData?.length>0){
+        setBookReview(bookData);
+      }
+      if(data){
+        setUserBookReview(true);
+      }
+    }
+  },[user,book,allReviews]);
+  useEffect(()=>{
+   if(user && allOrders?.length>0){
+    const userOrderData=allOrders?.filter(data=>data?.userId===user?.userId && data?.status==="Completed");
+    setUserCompletedOrders(userOrderData);
+   }
+  },[user]);
+  useEffect(()=>{
+   if(userCompletedOrders?.length>0){
+    const matchingOrders = userCompletedOrders.filter(order => {
+      return (
+        order.user?.userId === user?.userId &&
+        order.orderItems?.$values?.some(item => item.bookId === book?.bookId)
+      );
+    });
+    if(matchingOrders?.length>0){
+      setCheckReview(true);
+    }
+   }
+  },[userCompletedOrders]);
   
   // Get books from Redux store
   const bookState = useSelector(state => state?.books);
@@ -81,26 +122,6 @@ const BookDetails = () => {
       console.log(error);
     }
   }
-
-  const renderStars = (rating) => {
-    if (!rating) return null;
-    
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    
-    for (let i = 1; i <= 5; i++) {
-      if (i <= fullStars) {
-        stars.push(<FaStar key={i} className="text-yellow-400" />);
-      } else if (i === fullStars + 1 && hasHalfStar) {
-        stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
-      } else {
-        stars.push(<FaRegStar key={i} className="text-yellow-400" />);
-      }
-    }
-    
-    return stars;
-  };
 
 
 
@@ -161,16 +182,28 @@ const BookDetails = () => {
               <h1 className="text-2xl md:text-3xl font-bold mb-2">{book.title}</h1>
               <p className="text-lg text-gray-600 mb-4">by {book.author}</p>
               
-              {book.rating && (
+              {bookReview?.length>0 ? (
                 <div className="flex items-center mb-4">
                   <div className="flex mr-2">
-                    {renderStars(book.rating)}
+                    {renderStars(bookReview?.length > 0 
+  ? bookReview.reduce((sum, review) => sum + (review?.rating || 0), 0) / bookReview.length
+  : 0)}
                   </div>
-                  <span className="text-gray-600 text-sm">
+                  <span className="text-black text-sm">
                     {book.rating} ({book.reviews?.length || 0} reviews)
                   </span>
                 </div>
-              )}
+              ):(
+                <div className="flex items-center mb-4">
+                  <div className="flex mr-2">
+                    {renderStars(0)}
+                  </div>
+                  <span className="text-black text-sm">
+                     (0 reviews)
+                  </span>
+                </div>
+              )
+              }
 
               <div className="mb-6">
                 <div className="flex items-center gap-4 mb-3">
@@ -234,6 +267,21 @@ const BookDetails = () => {
                     <span className="text-red-600">Out of Stock</span>
                   )}
                 </div>
+                {checkReview && !userBookReview &&
+                <button className=''
+                onClick={()=>setIsDialogOpen(true)}
+                >
+                 Give Review
+                </button>
+                }
+                {isDialogOpen && 
+                  <RateDialog 
+                  toggleDialog={isDialogOpen} 
+                  setToggleDialog={setIsDialogOpen}
+                  userId={user?.userId}
+                  bookId={book?.bookId}
+                />
+                }
                 <div className="text-sm text-gray-600">
                   <p>Only available for in-store pickup. You'll receive a claim code after purchase.</p>
                 </div>

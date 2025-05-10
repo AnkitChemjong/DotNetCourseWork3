@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookStoreNepalServer.Models;
 
@@ -21,13 +22,15 @@ public class Review
 
     
         [Required]
+        [ForeignKey("User")]
         public int UserId { get; set; }
 
         [Required]
+        [ForeignKey("Book")]
         public int BookId { get; set; }
 
         // Navigation
-        public Users User { get; set; }
-        public Books Book { get; set; }
+        public Users? User { get; set; }
+        public Books? Book { get; set; }
 
 }

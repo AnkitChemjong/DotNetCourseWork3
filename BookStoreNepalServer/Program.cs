@@ -5,8 +5,13 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using BookStoreNepalServer.Services.Email;
 
+
 using BookStoreNepalServer.Hubs;
 using BookStoreNepalServer.Services.Notification;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Http.Connections;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,8 +22,13 @@ builder.Services.Configure<SmtpSettings>(
     builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddTransient<EmailService>();
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options => {
+    options.EnableDetailedErrors = true; // For debugging
+});
+
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
 
 
 
@@ -58,7 +68,29 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = audience,
         ClockSkew = TimeSpan.Zero
     };
+     options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+
+            // If the request is for SignalR, extract the token from the query string
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) &&
+                (path.StartsWithSegments("/notificationHub")))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
+
+
+
+
+
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -80,10 +112,19 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 // app.MapHub<NotificationHub>("/notificationHub");
 
-app.MapHub<NotificationHub>("/notificationHub");
-app.UseCors("AllowReactApp");
-app.UseHttpsRedirection();
+
+
+app.UseRouting();
+app.UseCors("AllowReactApp"); 
+    
+app.UseAuthentication();
 app.UseAuthorization();
+
+
 app.MapControllers();
+app.UseWebSockets();
+app.MapHub<NotificationHub>("/notificationHub", options => {
+    options.Transports = HttpTransportType.WebSockets;
+});
 
 app.Run();

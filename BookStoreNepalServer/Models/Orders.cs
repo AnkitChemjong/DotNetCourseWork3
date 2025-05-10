@@ -23,6 +23,10 @@ public class Orders
         [Range(0.01, double.MaxValue, ErrorMessage = "Total price must be positive")]
         public decimal TotalPrice { get; set; }
 
+        [Required(ErrorMessage = "Initial price is required")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Initial price must be positive")]
+        public decimal InitialPrice { get; set; }
+
         [Range(0, 100, ErrorMessage = "Discount must be between 0% and 100%")]
         public decimal? DiscountPercent { get; set; }
 

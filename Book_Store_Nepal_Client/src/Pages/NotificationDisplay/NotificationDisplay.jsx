@@ -1,11 +1,19 @@
 import NotificationsBell from '@/Components/NotificationListener/NotificationListener';
 import React from 'react'
+import { useSelector } from 'react-redux';
+
 
 const NotificationDisplay = () => {
-    const { data: user, token } = useSelector(state => state.auth);
+
+
+  const user = useSelector((state) => state.user.data);
+  const token = useSelector((state) => state.user.token);
+
+
+
   return (
     <div>
-        <NotificationsBell userId={user.userId} token={token} />
+        <NotificationsBell userId={user.userId}  token={token}/>
         
       
     </div>

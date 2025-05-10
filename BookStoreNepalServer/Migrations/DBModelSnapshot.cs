@@ -176,12 +176,6 @@ namespace BookStoreNepalServer.Migrations
                     b.Property<int?>("OrderId")
                         .HasColumnType("integer");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("bytea");
-
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
@@ -189,7 +183,7 @@ namespace BookStoreNepalServer.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("BookStoreNepalServer.Models.OrderItem", b =>
@@ -234,6 +228,9 @@ namespace BookStoreNepalServer.Migrations
                         .HasColumnType("text");
 
                     b.Property<decimal?>("DiscountPercent")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("InitialPrice")
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("OrderDate")

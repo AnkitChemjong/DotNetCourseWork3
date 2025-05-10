@@ -33,8 +33,6 @@ namespace BookStoreNepalServer.Models
         [Display(Name = "Read Status")]
         public bool IsRead { get; set; } = false;
 
-        // Concurrency token to handle parallel updates
-        [Timestamp]
-        public byte[] RowVersion { get; set; }
+    
     }
 }

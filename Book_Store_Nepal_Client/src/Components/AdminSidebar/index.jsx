@@ -12,7 +12,6 @@ const AdminSidebar = () => {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-
   const navItems = [
     {
       pageName: "Dashboard",

@@ -380,3 +380,13 @@ D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.As
 D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.Owin.dll
 D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.Owin.Security.dll
 D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Owin.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.AspNet.SignalR.SystemWeb.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.Owin.Host.SystemWeb.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.AspNetCore.Connections.Abstractions.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.AspNetCore.Http.Connections.Client.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.AspNetCore.Http.Connections.Common.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.AspNetCore.SignalR.Client.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.AspNetCore.SignalR.Client.Core.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.AspNetCore.SignalR.Common.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.AspNetCore.SignalR.Protocols.Json.dll
+D:\dotnetCW\DotNetCourseWork3\BookStoreNepalServer\bin\Debug\net8.0\Microsoft.Extensions.Features.dll

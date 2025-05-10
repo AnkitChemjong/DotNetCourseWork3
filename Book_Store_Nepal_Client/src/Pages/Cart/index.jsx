@@ -17,6 +17,7 @@ import axiosService from '@/Services/Axios';
 import { getAllCart } from '@/Store/Slice/AllCartSlice';
 import { useDispatch } from 'react-redux';
 import { getAllBook } from '@/Store/Slice/AllBookSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
   const cartState = useSelector(state => state?.carts);
@@ -25,6 +26,10 @@ const Cart = () => {
   const { data: user } = userState;
   const dispatch=useDispatch();
   const [userCart,setUserCart]=useState([]);
+  const [loading,setLoading]=useState(false);
+  const [loading1,setLoading1]=useState(false);
+  const [loading2,setLoading2]=useState(false);
+  const navigate=useNavigate();
 
 
   useEffect(()=>{
@@ -32,24 +37,28 @@ const Cart = () => {
       const userCartData = cartData?.filter(cart => cart.userId === user?.userId);
       setUserCart(userCartData);
     }
-    console.log("usercart id haita",userCart);
-  },[user]);
+    // console.log("usercart id haita",userCart);
+  },[user,cartData]);
 
   
   const handleOrder=async()=>{
     try{
+      setLoading(true);
       const response=await axiosService.post(`/api/order/place-from-cart/${user?.userId}`);
-      console.log(response);
+      console.log("response",response);
       if(response?.status===200){
-        alert(response?.data?.message);
-        clearAllCart();
+        await clearAllCart();
         dispatch(getAllCart());
         dispatch(getAllBook());
+        alert(response?.data?.message);
       }
-
     }
     catch(error){
       console.log(error);
+      alert(error?.response?.data?.message);
+    }
+    finally{
+      setLoading(false);
     }
   }
 
@@ -58,6 +67,7 @@ const Cart = () => {
 
   const cancelCart=async()=>{
     try{
+      setLoading1(true)
       const response=await axiosService.delete(`/api/cart/${userCart[0].cartId}`);
       console.log(response);
       if(response?.status===200){
@@ -69,11 +79,15 @@ const Cart = () => {
     catch(error){
       console.log(error);
     }
+    finally{
+      setLoading1(false);
+    }
   }
   const clearAllCart=async()=>{
     try{
+      setLoading2(true);
       const response=await axiosService.delete(`/api/cart/clear/${user?.userId}`);
-      console.log(response);
+      // console.log(response);
       if(response?.status===200){
         alert(response?.data?.message);
         dispatch(getAllCart());
@@ -82,6 +96,9 @@ const Cart = () => {
     }
     catch(error){
       console.log(error);
+    }
+    finally{
+      setLoading2(false);
     }
   }
 
@@ -102,6 +119,7 @@ const Cart = () => {
                 <TableRow>
                   <TableHead className="w-[100px]">Cart ID</TableHead>
                   <TableHead>Items</TableHead>
+                  <TableHead>Unit Price</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -111,15 +129,16 @@ const Cart = () => {
                 {userCart.map((cart) => (
                   <TableRow key={cart.cartId}>
                     <TableCell className="font-medium">{cart.cartId}</TableCell>
-                    <TableCell>{cart.totalItems}</TableCell>
+                    <TableCell>{cart.book.title}-{cart.totalItems}</TableCell>
+                    <TableCell>Rs {Number(cart.cartTotal)/Number(cart.totalItems)}</TableCell>
                     <TableCell>Rs {cart.cartTotal.toFixed(2)}</TableCell>
                     <TableCell>
                       {new Date(cart.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right space-x-2">
-                      <Button variant="outline" size="sm" className="text-red-600" onClick={cancelCart}>
+                      <Button disabled={loading1} variant="outline" size="sm" className="text-red-600" onClick={cancelCart}>
                         <FiTrash2 className="mr-2 h-4 w-4" />
-                        Remove
+                        {loading1? "Loading...":"Remove"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -129,23 +148,23 @@ const Cart = () => {
 
             <div className="mt-6 flex justify-end space-x-4">
                 <p>Total:-{userCart?.reduce((acc,obj)=>acc+Number(obj?.cartTotal||0),0)}</p>
-              <Button onClick={clearAllCart} variant="outline" className="text-red-600">
+              <Button disabled={loading2} onClick={clearAllCart} variant="outline" className="text-red-600">
                 <FiTrash2 className="mr-2 h-4 w-4" />
-                Clear Entire Cart
+                {loading2? "Loading...":"Clear Entire Cart"}
               </Button>
-              <Button className="text-black" onClick={handleOrder}>
+              <Button disabled={loading} className="text-black" onClick={handleOrder}>
                 <FiShoppingCart className="mr-2 h-4 w-4" />
-                Checkout All Items
+                {loading? "Loading...":"Checkout All Items"}
               </Button>
             </div>
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <h2 className="text-xl font-medium mb-2">Your cart is empty</h2>
+            <h2 className="text-xl text-black font-medium mb-2">Your cart is empty</h2>
             <p className="text-gray-600 mb-4">
               Looks like you haven't added any items to your cart yet.
             </p>
-            <Button>
+            <Button onClick={()=>navigate('/books')} className="text-black">
               Continue Shopping
             </Button>
           </div>

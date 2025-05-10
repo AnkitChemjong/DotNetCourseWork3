@@ -7,6 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import axiosService from '@/Services/Axios';
 import { getUser } from '@/Store/Slice/UserSlice';
 import { FaCartShopping } from "react-icons/fa6";
+import NotificationDisplay from '@/Pages/NotificationDisplay/NotificationDisplay';
+import { FaBell } from 'react-icons/fa';
+
 
 const UserNavbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -17,6 +20,13 @@ const UserNavbar = () => {
     const {data:user}=userState;
     const [toggle,setToggle]=useState(false);
     const proTog=useRef(null);
+    const [notifOpen, setNotifOpen]   = useState(false);
+const [profileOpen, setProfileOpen] = useState(false);
+
+
+    const count = useSelector(
+    state => state.notifications.items.filter(n => !n.isRead).length
+  );
     const navItems = [
         {
             pageName: "Home",
@@ -104,18 +114,52 @@ const UserNavbar = () => {
                                 <FaCartShopping onClick={()=>navigate('/cart')} className='w-5 h-5 cursor-pointer'/>
                             </div>
                         }
+
+
+                    {
+                                    user &&
+                                    <div className="p-2 relative">
+                                        <div
+                                        onClick={() => {
+                                        setNotifOpen(o => !o);
+                                        setProfileOpen(false);    
+                                        }}
+                                            className="cursor-pointer flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200"
+                                        >
+                                            <FaBell className="text-gray-700 w-5 h-5" />
+                                             {count > 0 && (
+          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+            {count}
+          </span>
+                                             )}
+                                        </div>
+                                        {notifOpen && (
+                                        <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded-lg z-50">
+                                        <NotificationDisplay />
+                                        </div>
+  
+                                        )}
+                                    </div>
+                                }
+
+
+  
+                        
                         {
                             user &&
-                            <div ref={proTog} onClick={()=>setToggle(!toggle)} className={`w-10 cursor-pointer h-10 rounded-full bg-white border-2 border-black flex items-center justify-center
-                                ${location.pathname === '/profile'
-                                    ? 'bg-indigo-100 text-indigo-700' 
-                                    : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
-    <p className='text-black font-bold text-xl'>
-        {user?.name?.slice(0,1)?.toUpperCase()}
-    </p>
-</div>
+                                                <div ref={proTog}   onClick={() => {
+                        setProfileOpen(o => !o);
+                        setNotifOpen(false);        
+                    }} className={`w-10 cursor-pointer h-10 rounded-full bg-white border-2 border-black flex items-center justify-center
+                                                    ${location.pathname === '/profile'
+                                                                                ? 'bg-indigo-100 text-indigo-700' 
+                                                                                : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600'}`}>
+                                                <p className='text-black font-bold text-xl'>
+                                                      {user?.name?.slice(0,1)?.toUpperCase()}
+                                                </p>
+                                            </div>
 
-                        }
+                                                }
                     </div>
 
                   
@@ -142,7 +186,7 @@ const UserNavbar = () => {
                     </div>
                 </div>
             </div>
-            {toggle && (
+            {profileOpen && (
           <div className={`absolute right-3 z-10 mt-1 w-48 origin-top-right rounded-md py-1 shadow-lg ring-1 ring-black/5 focus:outline-none bg-white`}>
             <div
               onClick={()=>navigate('/profile')}

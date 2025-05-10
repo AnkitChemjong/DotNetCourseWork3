@@ -22,6 +22,7 @@ import AllBooks from './Pages/AdminBookDetails';
 import UpdateBook from './Pages/UpdateBook';
 import StaffDashboard from './Pages/StaffDashboard';
 import StaffOrderList from './Pages/StaffOrderList';
+import { getAllReview } from './Store/Slice/AllReviewSlice';
 
 
 function AdminRoute({ children }) {
@@ -92,6 +93,7 @@ function App() {
   const cartStates = useSelector(state => state?.carts);
   const markStates = useSelector(state => state?.bookmarks);
   const orderStates = useSelector(state => state?.orders);
+  const reviewStates=useSelector(state=>state?.reviews);
   const dispatch=useDispatch();
   useState(()=>{
 if(!userState?.data){
@@ -108,6 +110,9 @@ if(!markStates?.data){
 }
 if(!orderStates?.data){
   dispatch(getAllOrder());
+}
+if(!reviewStates?.data){
+  dispatch(getAllReview());
 }
   },[]);
   function HomeRestrictForAdmin({children}){

@@ -32,19 +32,59 @@ namespace BookStoreNepalServer.Controllers
      [HttpGet]
         public async Task<IActionResult> GetNotifications([FromQuery] int userId, [FromQuery] bool onlyUnread = false)
         {
-            var query = _db.Notification
+            var query = _db.Notifications
                           .Where(n => n.UserId == userId);
 
             if (onlyUnread)
                 query = query.Where(n => !n.IsRead);
 
-            var notifications = await query
+                    var notifications = await query
+                .AsNoTracking()
                 .OrderByDescending(n => n.CreatedAt)
-               .ToListAsync();
+                .ToListAsync();
 
             return Ok(notifications);
         }
 
+        [HttpPatch("{id}/mark-as-read")]
+public async Task<IActionResult> MarkAsRead(int id)
+{
+    var notification = await _db.Notifications.FindAsync(id);
+    if (notification == null)
+        return NotFound();
+
+    notification.IsRead = true;
+    await _db.SaveChangesAsync();
+
+    return Ok();
+}
+
+
+ [HttpPatch("mark-all-as-read/{userId}")]
+    public async Task<IActionResult> MarkAllAsRead(int userId)
+    {
+        var list = await _db.Notifications
+                             .Where(n => n.UserId == userId && !n.IsRead)
+                             .ToListAsync();
+        list.ForEach(n => n.IsRead = true);
+        await _db.SaveChangesAsync();
+        return Ok();
+    }
+
+
+[HttpPost("test-broadcast/{userId}")]
+public async Task<IActionResult> TestBroadcast(int userId)
+{
+    await _notificationService.SendOrderPlacedNotificationAsync(userId, 999);
+    
+    return Ok("broadcast sent");
+}
+
 
     }
+
+    
 }
+
+
+

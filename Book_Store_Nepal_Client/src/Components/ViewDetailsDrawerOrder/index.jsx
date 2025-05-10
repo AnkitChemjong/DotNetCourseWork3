@@ -94,11 +94,16 @@ const ViewDetailsDrawerOrder = ({ toggleDrawer, setToggleDrawer, tempOrderForDet
                 <p className="text-sm text-muted-foreground">Subtotal:</p>
                 <p>NPR {tempOrderForDetails.totalPrice?.toFixed(2)}</p>
               </div>
-              {tempOrderForDetails.discountPercent > 0 && (
+              {tempOrderForDetails.discountPercent > 0 ? (
                 <div className="flex justify-end gap-4">
                   <p className="text-sm text-muted-foreground">Discount ({tempOrderForDetails.discountPercent}%):</p>
                   <p>- NPR {(tempOrderForDetails.totalPrice * tempOrderForDetails.discountPercent / 100)?.toFixed(2)}</p>
                 </div>
+              ):(
+                <div className="flex justify-end gap-4">
+                <p className="text-sm text-muted-foreground">Discount ({tempOrderForDetails.discountPercent}%):</p>
+                <p>- NPR 0</p>
+              </div>
               )}
               <div className="flex justify-end gap-4 font-semibold">
                 <p>Grand Total:</p>

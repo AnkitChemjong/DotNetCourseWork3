@@ -88,7 +88,7 @@ function Profile() {
 
           {/* Bookmarked Books Section */}
           <div className="bg-white p-6 rounded-2xl shadow-lg">
-            <h3 className="text-lg font-semibold mb-4">Bookmarked Books ({marks?.$values?.length || 0})</h3>
+            <h3 className="text-lg font-semibold mb-4">Bookmarked Books ({userMarks?.length || 0})</h3>
             
             {userMark?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { getAllOrder } from '@/Store/Slice/AllOrderSlice';
 import { useDispatch } from 'react-redux';
 import axiosService from '@/Services/Axios';
+import Footer from '@/Components/Footer';
 
 const UserOrders = () => {
     const dispatch=useDispatch();
@@ -12,6 +13,13 @@ const UserOrders = () => {
     const userState = useSelector(state => state?.user);
     const { data: user, loading1 } = userState;
     const [userOrders, setUserOrders] = useState([]);
+      
+
+
+ 
+
+    console.log("user id",user);
+
 
     useEffect(() => {
         if (allOrders?.length > 0) {
@@ -22,8 +30,10 @@ const UserOrders = () => {
         }
     }, [user, orderState]);
 
+
     const handleCancelOrder = async (orderId) => {
         try{
+            console.log(orderId)
             const response=await axiosService.patch(`/api/order/cancel/${orderId}/${user?.userId}`);
             console.log(response);
             if(response?.status===200){
@@ -43,10 +53,10 @@ const UserOrders = () => {
     };
 
     return (
-        <div className="flex flex-col min-w-screen min-h-screen">
+        <div className="flex flex-col min-w-screen min-h-screen overflow-auto mt-20">
             <UserNavbar />
             <div className="flex-grow container mx-auto flex items-center justify-center p-4">
-                <div className="bg-white rounded-lg shadow overflow-hidden">
+                <div className="bg-white rounded-lg shadow overflow-auto max-h-96">
                     <div className="px-6 py-4 border-b border-gray-200">
                         <h1 className="text-2xl font-semibold text-gray-900">Your Orders</h1>
                     </div>
@@ -74,6 +84,9 @@ const UserOrders = () => {
                                             Items
                                         </th>
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Initial Price
+                                        </th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Total
                                         </th>
                                         <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -98,13 +111,16 @@ const UserOrders = () => {
                                                     {order.orderItems?.$values?.map((item, index) => (
                                                         <div key={index} className="flex items-center">
                                                             <span className="mr-2">•</span>
-                                                            <span>{item.productName || 'Unknown Item'} (Qty: {item.quantity})</span>
+                                                            <span>{item.book.title || 'Unknown Item'} (Qty: {item.quantity})</span>
                                                         </div>
                                                     ))}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                ${order.totalPrice.toFixed(2)}
+                                                Rs.{order.initialPrice.toFixed(2)}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                Rs.{order.totalPrice.toFixed(2)}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -115,14 +131,19 @@ const UserOrders = () => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                {order.status === 'Placed' && (
+                            
+                                                   { order?.status==="Placed"?
                                                     <button
+                                                   
                                                         onClick={() => handleCancelOrder(order.orderId)}
-                                                        className="text-red-600 hover:text-red-900 font-medium"
+                                                        className="text-black hover:text-red-900 font-medium"
                                                     >
                                                         Cancel Order
-                                                    </button>
-                                                )}
+                                                    
+                                                    </button>:
+                                                    <p>N/A</p>
+                                                    }
+                                            
                                             </td>
                                         </tr>
                                     ))}
@@ -132,6 +153,7 @@ const UserOrders = () => {
                     )}
                 </div>
             </div>
+            <Footer/>
         </div>
     );
 };
