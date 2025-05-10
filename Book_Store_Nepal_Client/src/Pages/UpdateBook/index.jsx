@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AdminSidebar from '@/Components/AdminSidebar';
 import axios from 'axios';
 import axiosService from '@/Services/Axios';
+import { toast } from 'sonner';
 
 const UpdateBook = () => {
   const { id } = useParams();
@@ -42,7 +43,7 @@ const UpdateBook = () => {
         }
       } catch (error) {
         console.error('Error loading book:', error);
-        alert('Failed to load book details');
+        toast.error('Failed to load book details');
       }
     };
     fetchBook();
@@ -84,12 +85,12 @@ const UpdateBook = () => {
     try {
       const res = await axiosService.put(`/api/book/update/${id}`, book);
       if (res.status === 204) {
-        alert('Book updated successfully');
+        toast.success('Book updated successfully');
         navigate('/admin/managebook');
       }
     } catch (error) {
       console.error('Error updating book:', error);
-      alert(error.response?.data || 'Update failed');
+      toast.error(error.response?.data || 'Update failed');
     }
   };
 

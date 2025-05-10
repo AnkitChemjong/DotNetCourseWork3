@@ -19,6 +19,7 @@ import axiosService from '@/Services/Axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { getUser } from '@/Store/Slice/UserSlice';
+import { toast } from 'sonner';
 
 const SignIn = () => {
   const navigate=useNavigate();
@@ -42,7 +43,7 @@ const SignIn = () => {
       const response=await axiosService.post('/api/user/login',finalData);
       console.log(response);
       if(response?.status===200){
-        alert(response?.data?.message);
+        toast.success(response?.data?.message);
         dispatch(getUser());
         if(response?.data?.role==='admin'){
 
@@ -58,7 +59,7 @@ const SignIn = () => {
     }
     catch(error){
       console.log(error);
-      alert(error?.response?.data);
+      toast.error(error?.response?.data);
     }
   };
 

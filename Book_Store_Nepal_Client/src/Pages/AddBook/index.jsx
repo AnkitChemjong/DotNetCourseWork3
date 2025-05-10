@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AdminSidebar from '@/Components/AdminSidebar';
 import axios from 'axios';
 import axiosService from '@/Services/Axios';
+import { toast } from 'sonner';
 
 const AddBook = () => {
     const initialState={
@@ -55,13 +56,13 @@ const AddBook = () => {
         e.preventDefault();
         const response=await axiosService.post('/api/book/create',book);
        if(response?.status===201){
-        alert(response?.data?.message);
+         toast.success(response?.data?.message);
         setBook(initialState);
        }
     }
     catch(error){
         console.log(error);
-        alert(error?.response?.data);
+      toast.error(error?.response?.data);
     }
    
   };

@@ -4,6 +4,7 @@ import axiosService from "@/Services/Axios";
 export const getAllCart=createAsyncThunk("getAllCart",async ()=>{
   try{
       const carts=await axiosService.get("/api/cart/getAllCarts",{withCredentials:true});
+      console.log("dat",carts)
       if (carts?.data) {
         return carts.data?.$values;
       } 

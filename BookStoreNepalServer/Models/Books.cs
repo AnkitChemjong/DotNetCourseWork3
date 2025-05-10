@@ -37,6 +37,18 @@ public class Books
         [Required(ErrorMessage = "Language is required")]
         [MaxLength(20, ErrorMessage = "Language cannot exceed 20 characters")]
         public string Language { get; set; }
+        
+        [Required(ErrorMessage = "Discount is required")]
+    [Range(0, 100, ErrorMessage = "Discount must be between 0 and 100")]
+    public decimal Discount { get; set; }
+
+    [Required(ErrorMessage = "Discount start date is required")]
+    [DataType(DataType.Date, ErrorMessage = "Invalid start date format")]
+    public DateTime DiscountStartDate { get; set; }
+
+    [Required(ErrorMessage = "Discount end date is required")]
+    [DataType(DataType.Date, ErrorMessage = "Invalid end date format")]
+    public DateTime DiscountEndDate { get; set; }
 
         [Required(ErrorMessage = "Price is required")]
         [Range(0.01, 10000, ErrorMessage = "Price must be between $0.01 and $10,000")]
@@ -54,9 +66,6 @@ public class Books
 
         [DataType(DataType.Date)]
         public DateTime PublishedDate { get; set; } = DateTime.UtcNow;
-
-        [Range(0, 5, ErrorMessage = "Rating must be between 0 and 5")]
-        public double? Rating { get; set; }  
 
         public bool IsOnSale { get; set; } = false;
         

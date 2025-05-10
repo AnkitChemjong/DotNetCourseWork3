@@ -15,6 +15,8 @@ import { getAllCart } from '@/Store/Slice/AllCartSlice';
 import { getAllMark } from '@/Store/Slice/GetAllBookMark';
 import RateDialog from '@/Components/RateDialog';
 import renderStars from '@/Components/RenderStar';
+import { getAllBook } from '@/Store/Slice/AllBookSlice';
+import { toast } from 'sonner';
 const BookDetails = () => {
   const userState=useSelector(state=>state?.user);
   const {data:user}=userState;
@@ -35,6 +37,7 @@ const BookDetails = () => {
   const [isDialogOpen,setIsDialogOpen]=useState(false);
   const [userBookReview,setUserBookReview]=useState(false);
   const [bookReview,setBookReview]=useState([]);
+ 
 
   useEffect(()=>{
     if(user && book && allReviews?.length>0){
@@ -81,31 +84,46 @@ const BookDetails = () => {
     }
   }, [id, allBooks]);
 
-  const handleAddToCart=async()=>{
-    try{
-      const finalData={totalItems:quantity,cartTotal:quantity*Number(book?.price),userId:user?.userId,bookId:book?.bookId};
-      if(quantity<=Number(book?.stock)){
-        const response=await axiosService.post('/api/cart/addToCart',finalData);
-        console.log(response);
-        if(response?.status===200){
+  const handleAddToCart = async () => {
+    try {
+      // Calculate the actual price (considering discount if applicable)
+      const currentPrice = book.discount > 0 && new Date(book.discountEndDate) > new Date()
+        ? book.price * (1 - book.discount / 100)
+        : book.price;
+  
+      const finalData = {
+        totalItems: quantity,
+        cartTotal: quantity * Number(currentPrice),
+        userId: user?.userId,
+        bookId: book?.bookId,
+        originalPrice: book.price, // Include original price
+        discount: book.discount,   // Include discount percentage
+        discountedPrice: currentPrice // Include the actual price being charged
+      };
+  
+      if (quantity <= Number(book?.stock)) {
+        const response = await axiosService.post('/api/cart/addToCart', finalData);
+        if (response?.status === 200) {
           dispatch(getAllCart());
-          alert(response?.data?.message);
+          dispatch(getAllBook());
+          toast.success(response?.data?.message || "Added to cart successfully");
         }
+      } else if( Number(book?.stock)===0) {
+        toast.error("Book out of stock.");
       }
       else{
-        alert("Quantity is more than Stock.");
+        toast.error("Quantity exceeds available stock");
       }
-
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error(error.response?.data?.message || "Failed to add to cart");
     }
-    catch(error){
-      console.log(error);
-    }
-  }
+  };
   const handleBookMark=async(data)=>{
     try{
       const userMarks=marks?.find(item=>item?.userId===user?.userId&&item?.book?.bookId===data?.bookId);
       if(userMarks){
-        alert("Book already Bookmarked.")
+        toast.info("Book already Bookmarked.")
       }
       else{
 
@@ -114,7 +132,7 @@ const BookDetails = () => {
         // console.log(response);
         if(response?.status===200){
         dispatch(getAllMark());
-          alert(response?.data?.message);
+          toast.success(response?.data?.message);
         }
       }
     }
@@ -177,117 +195,144 @@ const BookDetails = () => {
           </div>
 
           {/* Book Info */}
-          <div className="lg:w-2/3">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">{book.title}</h1>
-              <p className="text-lg text-gray-600 mb-4">by {book.author}</p>
-              
-              {bookReview?.length>0 ? (
-                <div className="flex items-center mb-4">
-                  <div className="flex mr-2">
-                    {renderStars(bookReview?.length > 0 
-  ? bookReview.reduce((sum, review) => sum + (review?.rating || 0), 0) / bookReview.length
-  : 0)}
-                  </div>
-                  <span className="text-black text-sm">
-                    {book.rating} ({book.reviews?.length || 0} reviews)
-                  </span>
-                </div>
-              ):(
-                <div className="flex items-center mb-4">
-                  <div className="flex mr-2">
-                    {renderStars(0)}
-                  </div>
-                  <span className="text-black text-sm">
-                     (0 reviews)
-                  </span>
-                </div>
-              )
-              }
+          {/* Book Info */}
+<div className="lg:w-2/3">
+  <div className="bg-white p-6 rounded-lg shadow-md">
+    <h1 className="text-2xl md:text-3xl font-bold mb-2">{book.title}</h1>
+    <p className="text-lg text-gray-600 mb-4">by {book.author}</p>
+    
+    {bookReview?.length>0 ? (
+      <div className="flex items-center mb-4">
+        <div className="flex mr-2">
+          {renderStars(bookReview?.length > 0 
+            ? bookReview.reduce((sum, review) => sum + (review?.rating || 0), 0) / bookReview.length
+            : 0)}
+        </div>
+        <span className="text-black text-sm">
+          {book.rating} ({book.reviews?.length || 0} reviews)
+        </span>
+      </div>
+    ):(
+      <div className="flex items-center mb-4">
+        <div className="flex mr-2">
+          {renderStars(0)}
+        </div>
+        <span className="text-black text-sm">
+          (0 reviews)
+        </span>
+      </div>
+    )}
 
-              <div className="mb-6">
-                <div className="flex items-center gap-4 mb-3">
-                  <span className="text-lg font-semibold">Format:</span>
-                  <select className="border border-gray-300 rounded px-3 py-1">
-                    <option value="paperback">
-                      Paperback {book.stock > 0 ? '(In Stock)' : '(Out of Stock)'}
-                    </option>
-                  </select>
-                </div>
-              </div>
+    <div className="mb-6">
+      <div className="flex items-center gap-4 mb-3">
+        <span className="text-lg font-semibold">Format:</span>
+        <select className="border border-gray-300 rounded px-3 py-1">
+          <option value="paperback">
+            Paperback {book.stock > 0 ? '(In Stock)' : '(Out of Stock)'}
+          </option>
+        </select>
+      </div>
+    </div>
 
-              <div className="mb-6">
-                <span className="text-3xl font-bold">
-                  Rs {book.price.toFixed(2)}
-                </span>
-              </div>
+    {/* Discount Price Display */}
+    {book.discount > 0 && new Date(book.discountEndDate) > new Date() ? (
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-gray-500 line-through text-xl">Rs {book.price.toFixed(2)}</span>
+          <span className="bg-red-600 text-white text-sm font-bold px-2 py-0.5 rounded">
+            {book.discount}% OFF
+          </span>
+        </div>
+        <span className="text-3xl font-bold text-red-600">
+          Rs {(book.price * (1 - book.discount/100)).toFixed(2)}
+        </span>
+        <div className="text-sm text-gray-600 mt-1">
+          You save Rs {(book.price * (book.discount/100)).toFixed(2)} • 
+          Offer valid: {new Date(book.discountStartDate).toLocaleDateString()} - {new Date(book.discountEndDate).toLocaleDateString()}
+        </div>
+      </div>
+    ) : (
+      <div className="mb-6">
+        <span className="text-3xl font-bold">
+          Rs {book.price.toFixed(2)}
+        </span>
+      </div>
+    )}
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">Quantity:</span>
-                  <div className="flex border border-gray-300 rounded">
-                    <button 
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200"
-                    >
-                      -
-                    </button>
-                    <span className="px-4 py-1">{quantity}</span>
-                    <button 
-                      onClick={() => setQuantity(quantity + 1)}
-                      className="px-3 py-1 bg-gray-100 hover:bg-gray-200"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
+    {/* Countdown Timer for Discount (if active) */}
+    {book.discount > 0 && new Date(book.discountEndDate) > new Date() && (
+      <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded p-3">
+        <div className="flex items-center gap-2">
+          <span className="text-yellow-800 font-medium">⏰ Limited Time Offer:</span>
+          <span className="text-yellow-600 text-sm">
+            Ends in {Math.ceil((new Date(book.discountEndDate) - new Date()) / (1000 * 60 * 60 * 24))} days
+          </span>
+        </div>
+      </div>
+    )}
 
-                <div className="flex-1 flex flex-col sm:flex-row gap-2">
-                  <button onClick={handleAddToCart} className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700  py-2 px-4 rounded">
-                    <FiShoppingCart />
-                    <span>Add to Cart</span>
-                  </button>
-                  <button onClick={()=>handleBookMark(book)} className="flex items-center justify-center gap-2 border border-blue-600 text-blue-600 hover:bg-blue-50 py-2 px-4 rounded">
-                    <FiBookmark />
-                    <span>Save for Later</span>
-                  </button>
-                  <button className="flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-100 py-2 px-4 rounded">
-                    <FiShare2 />
-                    <span>Share</span>
-                  </button>
-                </div>
-              </div>
+    <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="flex items-center gap-2">
+        <span className="font-medium">Quantity:</span>
+        <div className="flex border border-gray-300 rounded">
+          <button 
+            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+            className="px-3 py-1 bg-gray-100 hover:bg-gray-200"
+          >
+            -
+          </button>
+          <span className="px-4 py-1">{quantity}</span>
+          <button 
+            onClick={() => setQuantity(quantity + 1)}
+            className="px-3 py-1 bg-gray-100 hover:bg-gray-200"
+          >
+            +
+          </button>
+        </div>
+      </div>
 
-              <div className="border-t border-gray-200 pt-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-medium">Availability:</span>
-                  {book.stock > 0 ? (
-                    <span className="text-green-600">In Stock ({book.stock} available)</span>
-                  ) : (
-                    <span className="text-red-600">Out of Stock</span>
-                  )}
-                </div>
-                {checkReview && !userBookReview &&
-                <button className=''
-                onClick={()=>setIsDialogOpen(true)}
-                >
-                 Give Review
-                </button>
-                }
-                {isDialogOpen && 
-                  <RateDialog 
-                  toggleDialog={isDialogOpen} 
-                  setToggleDialog={setIsDialogOpen}
-                  userId={user?.userId}
-                  bookId={book?.bookId}
-                />
-                }
-                <div className="text-sm text-gray-600">
-                  <p>Only available for in-store pickup. You'll receive a claim code after purchase.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+      <div className="flex-1 flex flex-col sm:flex-row gap-2">
+        <button onClick={handleAddToCart} className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-black py-2 px-4 rounded">
+          <FiShoppingCart />
+          <span className='text-black'>Add to Cart</span>
+        </button>
+        <button onClick={()=>handleBookMark(book)} className="flex items-center justify-center gap-2 border text-black border-blue-600  hover:bg-blue-50 py-2 px-4 rounded">
+          <FiBookmark />
+          <span >Save for Later</span>
+        </button>
+      </div>
+    </div>
+
+    <div className="border-t border-gray-200 pt-4">
+      <div className="flex items-center gap-2 mb-2">
+        <span className="font-medium">Availability:</span>
+        {book.stock > 0 ? (
+          <span className="text-green-600">In Stock ({book.stock} available)</span>
+        ) : (
+          <span className="text-red-600">Out of Stock</span>
+        )}
+      </div>
+      {checkReview && !userBookReview &&
+        <button className='text-black hover:text-blue-800'
+          onClick={()=>setIsDialogOpen(true)}
+        >
+          Give Review
+        </button>
+      }
+      {isDialogOpen && 
+        <RateDialog 
+          toggleDialog={isDialogOpen} 
+          setToggleDialog={setIsDialogOpen}
+          userId={user?.userId}
+          bookId={book?.bookId}
+        />
+      }
+      <div className="text-sm text-gray-600">
+        <p>Only available for in-store pickup. You'll receive a claim code after purchase.</p>
+      </div>
+    </div>
+  </div>
+</div>
         </div>
 
         {/* Additional Information */}

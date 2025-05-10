@@ -5,6 +5,7 @@ import CheckClaimCodeDialog from '@/Components/CheckClaimCodeDialog';
 import ViewDetailsDrawerOrder from '@/Components/ViewDetailsDrawerOrder';
 import axiosService from '@/Services/Axios';
 import { getAllOrder } from '@/Store/Slice/AllOrderSlice';
+import { toast } from 'sonner';
 
 const StaffOrderList = () => {
     const userState = useSelector(state => state?.user);
@@ -21,14 +22,14 @@ const StaffOrderList = () => {
         try{
             const response=await axiosService.delete(`/api/order/deleteOrder/${id}`);
             if(response?.status===200){
-                alert(response?.data?.message);
+                toast.success(response?.data?.message);
                 dispatch(getAllOrder());
             }
 
         }
         catch(error){
             console.log(error);
-            alert(error?.response?.data?.message);
+            toast.error(error?.response?.data?.message);
         }
     }
     return (

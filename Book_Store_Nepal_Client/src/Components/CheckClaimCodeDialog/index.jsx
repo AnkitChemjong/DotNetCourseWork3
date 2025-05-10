@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import axiosService from '@/Services/Axios';
 import { getAllOrder } from '@/Store/Slice/AllOrderSlice';
 import { useDispatch } from 'react-redux';
+import { toast } from 'sonner';
 
 const CheckClaimCodeDialog = ({ toggleDialog, setToggleDialog, orderData,setTempOrderData }) => {
   const [code, setCode] = useState("");
@@ -19,7 +20,7 @@ const CheckClaimCodeDialog = ({ toggleDialog, setToggleDialog, orderData,setTemp
 
   const handleCheckClaimCode = async () => {
     if (!code.trim()) {
-      alert("Please enter a claim code");
+      toast.error("Please enter a claim code");
       return;
     }
 
@@ -29,15 +30,15 @@ const CheckClaimCodeDialog = ({ toggleDialog, setToggleDialog, orderData,setTemp
         `/api/order/verify/${orderData?.user?.userId}/${orderData.orderId}/${code}`);
 
       if (response?.status===200) {
-        alert(response?.data?.message || "Order verified successfully");
+        toast.success(response?.data?.message || "Order verified successfully");
         setToggleDialog(false);
         dispatch(getAllOrder());
         setTempOrderData(null);
       } else {
-        alert(response?.data?.message || "Failed to verify order");
+        toast.error(response?.data?.message || "Failed to verify order");
       }
     } catch (error) {
-      alert(error?.response?.data?.message);
+      toast.error(error?.response?.data?.message);
     } finally {
       setIsLoading(false);
     }

@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import axiosService from '@/Services/Axios';
 import { useDispatch } from 'react-redux';
 import { getAllReview } from '@/Store/Slice/AllReviewSlice';
+import { getAllBook } from '@/Store/Slice/AllBookSlice';
+import { toast } from 'sonner';
 
 const RateDialog = ({ toggleDialog, setToggleDialog, userId, bookId }) => {
   const [rating, setRating] = useState(0);
@@ -23,13 +25,14 @@ const RateDialog = ({ toggleDialog, setToggleDialog, userId, bookId }) => {
      const response=await axiosService.post('/api/review/addreview',{userId,bookId,rating,comment});
      console.log(response);
      if(response?.status===200){
-         alert(response?.data);
+         toast.success(response?.data);
          setToggleDialog(false);
+         dispatch(getAllBook());
          dispatch(getAllReview());
      }
     } catch (error) {
       console.error('Error submitting rating:', error);
-      alert(error?.response?.data);
+      toast.error(error?.response?.data);
     } finally {
       setIsSubmitting(false);
     }

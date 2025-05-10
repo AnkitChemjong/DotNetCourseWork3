@@ -18,10 +18,11 @@ import { getAllCart } from '@/Store/Slice/AllCartSlice';
 import { useDispatch } from 'react-redux';
 import { getAllBook } from '@/Store/Slice/AllBookSlice';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Cart = () => {
   const cartState = useSelector(state => state?.carts);
-  const { data: cartData = [] } = cartState;
+  const { data: cartData} = cartState;
   const userState = useSelector(state => state?.user);
   const { data: user } = userState;
   const dispatch=useDispatch();
@@ -30,7 +31,7 @@ const Cart = () => {
   const [loading1,setLoading1]=useState(false);
   const [loading2,setLoading2]=useState(false);
   const navigate=useNavigate();
-
+  console.log(cartData)
 
   useEffect(()=>{
     if(user){
@@ -50,12 +51,12 @@ const Cart = () => {
         await clearAllCart();
         dispatch(getAllCart());
         dispatch(getAllBook());
-        alert(response?.data?.message);
+        toast.success(response?.data?.message);
       }
     }
     catch(error){
       console.log(error);
-      alert(error?.response?.data?.message);
+      toast.error(error?.response?.data?.message);
     }
     finally{
       setLoading(false);
@@ -65,13 +66,13 @@ const Cart = () => {
 
 
 
-  const cancelCart=async()=>{
+  const cancelCart=async(cartId)=>{
     try{
       setLoading1(true)
-      const response=await axiosService.delete(`/api/cart/${userCart[0].cartId}`);
-      console.log(response);
+      const response=await axiosService.delete(`/api/cart/${cartId}`);
+      //console.log(response);
       if(response?.status===200){
-        alert(response?.data?.message);
+        toast.success(response?.data?.message);
         dispatch(getAllCart());
       }
 
@@ -89,7 +90,7 @@ const Cart = () => {
       const response=await axiosService.delete(`/api/cart/clear/${user?.userId}`);
       // console.log(response);
       if(response?.status===200){
-        alert(response?.data?.message);
+        toast.success(response?.data?.message);
         dispatch(getAllCart());
       }
 
@@ -120,6 +121,8 @@ const Cart = () => {
                   <TableHead className="w-[100px]">Cart ID</TableHead>
                   <TableHead>Items</TableHead>
                   <TableHead>Unit Price</TableHead>
+                  <TableHead> Discount</TableHead>
+                  <TableHead>Discounted Price</TableHead>
                   <TableHead>Total</TableHead>
                   <TableHead>Created</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -130,13 +133,15 @@ const Cart = () => {
                   <TableRow key={cart.cartId}>
                     <TableCell className="font-medium">{cart.cartId}</TableCell>
                     <TableCell>{cart.book.title}-{cart.totalItems}</TableCell>
-                    <TableCell>Rs {Number(cart.cartTotal)/Number(cart.totalItems)}</TableCell>
+                    <TableCell>Rs {Number(cart.cartTotal)/Number(cart.totalItems) || cart.originalPrice}</TableCell>
+                    <TableCell> {cart.discount} %</TableCell>
+                    <TableCell>Rs {cart.discountedPrice||0}</TableCell>
                     <TableCell>Rs {cart.cartTotal.toFixed(2)}</TableCell>
                     <TableCell>
                       {new Date(cart.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right space-x-2">
-                      <Button disabled={loading1} variant="outline" size="sm" className="text-red-600" onClick={cancelCart}>
+                      <Button disabled={loading1} variant="outline" size="sm" className="text-red-600" onClick={()=>cancelCart(cart?.cartId)}>
                         <FiTrash2 className="mr-2 h-4 w-4" />
                         {loading1? "Loading...":"Remove"}
                       </Button>

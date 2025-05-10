@@ -10,6 +10,7 @@ import { FaCartShopping } from "react-icons/fa6";
 import NotificationDisplay from '@/Pages/NotificationDisplay/NotificationDisplay';
 import { FaBell } from 'react-icons/fa';
 
+import { toast } from 'sonner';
 
 const UserNavbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -58,13 +59,13 @@ const [profileOpen, setProfileOpen] = useState(false);
             const response=await axiosService.get('/api/user/logout');
             if(response?.status===200){
                 dispatch(getUser());
-                alert(response?.data?.message);
+                toast.success(response?.data?.message);
                 navigate('/sign-in');
             }
         }
         catch(error){
             console.log(error);
-            alert(error?.message);
+            toast.error(error?.message);
         }
     };
     useEffect(() => {

@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { Link } from 'react-router-dom';
 import axiosService from '@/Services/Axios';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters").max(20),
@@ -46,13 +47,13 @@ const SignUp = () => {
       const response=await axiosService.post('/api/user/register',finalData);
       console.log(response);
       if(response?.status===201){
-          alert(response?.data?.message);
+          toast.success(response?.data?.message);
           navigate('/sign-in');
       }
     }
     catch(error){
       console.log(error);
-      alert(error?.response?.data?.message);
+      toast.error(error?.response?.data?.message);
     }
   };
 

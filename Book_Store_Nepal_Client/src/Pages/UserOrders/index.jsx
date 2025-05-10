@@ -5,6 +5,7 @@ import { getAllOrder } from '@/Store/Slice/AllOrderSlice';
 import { useDispatch } from 'react-redux';
 import axiosService from '@/Services/Axios';
 import Footer from '@/Components/Footer';
+import { toast } from 'sonner';
 
 const UserOrders = () => {
     const dispatch=useDispatch();
@@ -37,13 +38,13 @@ const UserOrders = () => {
             const response=await axiosService.patch(`/api/order/cancel/${orderId}/${user?.userId}`);
             console.log(response);
             if(response?.status===200){
-              alert(response?.data);
+              toast.success(response?.data);
               dispatch(getAllOrder());
             }
       
           }
         catch(error){
-            alert(error?.response?.data);
+            toast.error(error?.response?.data);
         }
     };
 

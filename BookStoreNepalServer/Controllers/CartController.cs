@@ -17,19 +17,58 @@ namespace BookStoreNepalServer.Controllers
         {
             _db = db;
         }
-        [HttpPost("addToCart")]
+       [HttpPost("addToCart")]
 public async Task<IActionResult> AddToCart([FromBody] Cart cart)
 {
+    // Check if this book already exists in user's cart
+    var existingCartItem = await _db.Carts
+        .FirstOrDefaultAsync(c => c.BookId == cart.BookId && c.UserId == cart.UserId);
+
+    if (existingCartItem != null)
+    {
+        return Conflict(new { 
+            success = false,
+            message = "Item already exists in your cart",
+            existingItem = new {
+                existingCartItem.CartId,
+                existingCartItem.BookId,
+                existingCartItem.TotalItems
+            }
+        });
+    }
+
+    // Validate book exists
+    var book = await _db.Books.FindAsync(cart.BookId);
+    if (book == null)
+    {
+        return NotFound(new { success = false, message = "Book not found" });
+    }
+
+    // Validate user exists
+    var user = await _db.Users.FindAsync(cart.UserId);
+    if (user == null) 
+    {
+        return NotFound(new { success = false, message = "User not found" });
+    }
+
+    // Set created date
+    cart.CreatedAt = DateTime.UtcNow;
+
     await _db.Carts.AddAsync(cart);
     await _db.SaveChangesAsync();
-    return Ok(new { message = "Item added to cart successfully." });
+
+    return Ok(new { 
+        success = true,
+        message = "Item added to cart successfully.",
+        cartId = cart.CartId
+    });
 }
 
 [HttpGet("getAllCarts")]
 public async Task<ActionResult<IEnumerable<Cart>>> GetAllCarts()
 {
     var carts = await _db.Carts
-        .Include(c => c.Book) // Include the Book navigation property
+        .Include(c => c.Book) 
         .ToListAsync();
 
     if (carts == null || carts.Count == 0)

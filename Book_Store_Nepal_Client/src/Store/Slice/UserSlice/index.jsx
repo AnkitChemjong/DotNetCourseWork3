@@ -11,7 +11,7 @@ export const getUser = createAsyncThunk("getUser", async () => {
       };
     }
     else {
-      // Return null if user or token is missing
+   
       return {
         user: null,
         token: null,

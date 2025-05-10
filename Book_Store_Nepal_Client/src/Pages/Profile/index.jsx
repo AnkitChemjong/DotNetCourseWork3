@@ -8,6 +8,7 @@ import { getAllMark } from '@/Store/Slice/GetAllBookMark';
 import { useDispatch } from 'react-redux';
 import { Button } from '@/Components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 function Profile() {
   const navigate=useNavigate();
@@ -35,13 +36,13 @@ function Profile() {
      const response=await axiosService.delete(`/api/whitelist/delete/${listId}`);
      if(response?.status===200){
       dispatch(getAllMark());
-      alert(response?.data);
+      toast.success(response?.data);
      }
     }
     }
     catch(error){
       console.log(error);
-      alert(error?.response?.data)
+    toast.error(error?.response?.data)
     }
   };
 
