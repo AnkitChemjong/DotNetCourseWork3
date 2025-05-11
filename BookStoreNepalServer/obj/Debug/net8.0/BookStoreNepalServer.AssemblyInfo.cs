@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BookStoreNepalServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1469495c6ee9db2507f856f72eb3ac20f3c3d46c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2053721f8ce4457988d9c4783be6fdabc046e356")]
 [assembly: System.Reflection.AssemblyProductAttribute("BookStoreNepalServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BookStoreNepalServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

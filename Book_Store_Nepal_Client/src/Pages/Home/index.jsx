@@ -234,7 +234,7 @@ const Home = () => {
   </div>
 </div>
             
-            {/* Price with discount */}
+            {/* Price with discount  */}
             <div className="mt-2">
               {book.discount > 0 && new Date(book.discountEndDate) > new Date() ? (
                 <>
@@ -287,8 +287,6 @@ const Home = () => {
         </div>
       </section>
       </div>
-     
-  
       <Footer/>
     </div>
 
