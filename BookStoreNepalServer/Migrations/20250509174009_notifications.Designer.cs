@@ -3,6 +3,7 @@ using System;
 using BookStoreNepalServer.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookStoreNepalServer.Migrations
 {
     [DbContext(typeof(DB))]
-    partial class DBModelSnapshot : ModelSnapshot
+    [Migration("20250509174009_notifications")]
+    partial class notifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,15 +72,6 @@ namespace BookStoreNepalServer.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("DiscountEndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("DiscountStartDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Format")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -110,6 +104,9 @@ namespace BookStoreNepalServer.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<double?>("Rating")
+                        .HasColumnType("double precision");
 
                     b.Property<int>("Stock")
                         .HasColumnType("integer");
@@ -144,15 +141,6 @@ namespace BookStoreNepalServer.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("DiscountedPrice")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("OriginalPrice")
-                        .HasColumnType("numeric");
 
                     b.Property<int>("TotalItems")
                         .HasColumnType("integer");
@@ -190,6 +178,12 @@ namespace BookStoreNepalServer.Migrations
 
                     b.Property<int?>("OrderId")
                         .HasColumnType("integer");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");

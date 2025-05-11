@@ -14,6 +14,13 @@ const UserOrders = () => {
     const userState = useSelector(state => state?.user);
     const { data: user, loading1 } = userState;
     const [userOrders, setUserOrders] = useState([]);
+      
+
+
+ 
+
+    console.log("user id",user);
+
 
     useEffect(() => {
         if (allOrders?.length > 0) {

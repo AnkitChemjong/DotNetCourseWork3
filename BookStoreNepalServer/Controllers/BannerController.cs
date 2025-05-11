@@ -54,8 +54,8 @@ namespace BookStoreNepalServer.Controllers
         return Ok(new { message = "Banner created successfully." });
     }
 
-                    // GET: api/banner/active
-            [HttpGet("active")]
+        // GET: api/banner/active
+        [HttpGet("active")]
             public async Task<IActionResult> GetActiveBanner()
             {
             var now = DateTime.UtcNow;

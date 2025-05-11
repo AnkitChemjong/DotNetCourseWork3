@@ -5,6 +5,7 @@ using BookStoreNepalServer.Database;
 using Microsoft.EntityFrameworkCore;
 using BookStoreNepalServer.Services.Email;
 using System.Text;
+using BookStoreNepalServer.Services.Notification;
 
 namespace BookStoreNepalServer.Controllers
 {
@@ -15,11 +16,13 @@ namespace BookStoreNepalServer.Controllers
 
         private readonly DB _db;
         private readonly EmailService _emailService;
+        private readonly NotificationService _notificationService;
 
-public OrderController(DB db, EmailService emailService)
+public OrderController(DB db, EmailService emailService,NotificationService notificationService)
 {
     _db = db;
-    _emailService = emailService;
+    _emailService = emailService; 
+    _notificationService = notificationService;
 }
 
 
@@ -99,9 +102,13 @@ public OrderController(DB db, EmailService emailService)
             // d) Remove all cart items
             _db.Carts.RemoveRange(cartItems);
 
+
             // e) Commit
             await _db.SaveChangesAsync();
             await tx.CommitAsync();
+
+
+            await _notificationService.SendOrderPlacedNotificationAsync(userId, order.OrderId);
             
             string subject = "Order Confirmation - Book Store Nepal";
            string body = $@"

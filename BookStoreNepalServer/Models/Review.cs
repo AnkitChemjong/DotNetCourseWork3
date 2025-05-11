@@ -20,7 +20,7 @@ public class Review
         [DataType(DataType.DateTime)]
         public DateTime ReviewDate { get; set; } = DateTime.UtcNow;
 
-        // Foreign Keys
+    
         [Required]
         [ForeignKey("User")]
         public int UserId { get; set; }

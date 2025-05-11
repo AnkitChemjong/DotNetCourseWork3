@@ -98,7 +98,7 @@ namespace BookStoreNepalServer.Controllers
 
     Response.Cookies.Append("token", tokenString, new CookieOptions
     {
-        HttpOnly = true,
+        HttpOnly = false,
         Secure = false, 
         SameSite = SameSiteMode.Lax,
         Expires = DateTimeOffset.UtcNow.AddDays(1)
@@ -191,7 +191,7 @@ public async Task<ActionResult<object>> GetLoginUser()
             return Ok(new { user = (Users)null });
         }
 
-        return Ok(new { user });
+        return Ok(new { user, token, message = "User retrieved successfully" });
     }
     catch (Exception)
     {
