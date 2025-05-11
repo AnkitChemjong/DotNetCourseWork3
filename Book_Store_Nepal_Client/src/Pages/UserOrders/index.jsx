@@ -29,12 +29,12 @@ const UserOrders = () => {
                 setUserOrders(filterOrder);
             }
         }
-    }, [user, orderState]);
+    }, [user, allOrders]);
 
 
     const handleCancelOrder = async (orderId) => {
         try{
-            console.log(orderId)
+            //console.log(orderId)
             const response=await axiosService.patch(`/api/order/cancel/${orderId}/${user?.userId}`);
             console.log(response);
             if(response?.status===200){

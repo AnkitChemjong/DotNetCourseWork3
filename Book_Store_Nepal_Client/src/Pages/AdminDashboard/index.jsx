@@ -51,14 +51,12 @@ const AdminDashboard = () => {
   console.log("user id", user?.userId);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen md:gap-80 justify-center items-center">
  
       <div className="w-64 flex-shrink-0">
         <AdminSidebar />
       </div>
-
-
-      <main className="flex-1 bg-gray-50 p-6">
+      <main className="flex-1  p-6 bg-gray-100 rounded-3xl">
         <h1 className="text-2xl font-bold text-blue-600 mb-6">Create Timed Banner</h1>
 
         <form

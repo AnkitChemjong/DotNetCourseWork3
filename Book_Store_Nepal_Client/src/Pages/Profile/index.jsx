@@ -84,6 +84,10 @@ function Profile() {
               </div>
             </div>
             <Button onClick={()=>navigate('/userorder')} className="text-black hover:bg-amber-400">My Orders</Button>
+            {
+              user && user?.role==="staff" &&
+              <Button onClick={()=>navigate('/staff/dashboard')} className="text-black hover:bg-amber-400">Dashboard</Button>
+            }
             </div>
           </div>
 

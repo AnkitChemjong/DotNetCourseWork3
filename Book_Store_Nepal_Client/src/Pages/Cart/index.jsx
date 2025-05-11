@@ -31,7 +31,6 @@ const Cart = () => {
   const [loading1,setLoading1]=useState(false);
   const [loading2,setLoading2]=useState(false);
   const navigate=useNavigate();
-  console.log(cartData)
 
   useEffect(()=>{
     if(user){
@@ -56,7 +55,7 @@ const Cart = () => {
     }
     catch(error){
       console.log(error);
-      toast.error(error?.response?.data?.message);
+      toast.error(error?.response?.data?.message ||error?.response?.data);
     }
     finally{
       setLoading(false);

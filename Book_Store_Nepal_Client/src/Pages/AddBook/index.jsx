@@ -68,11 +68,11 @@ const AddBook = () => {
   };
 
   return (
-    <div className="flex min-h-screen overflow-hidden">
+    <div className="flex min-h-screen overflow-hidden md:gap-80 justify-center items-center">
       <div className="hidden md:block w-64">
         <AdminSidebar />
       </div>
-      <div className="flex-grow overflow-auto p-6">
+      <div className="flex-grow overflow-auto p-6 bg-gray-100 rounded-3xl">
         <div className="max-w-4xl mx-auto bg-white shadow-md rounded-md mt-8 p-6">
           <h2 className="text-2xl font-bold text-indigo-600 mb-6">Add Book</h2>
           <form onSubmit={handleSubmit} encType="multipart/form-data">
