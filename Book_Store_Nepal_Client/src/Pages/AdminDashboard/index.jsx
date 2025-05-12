@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import AdminSidebar from '@/Components/AdminSidebar';
-import axios from 'axios';
 import axiosService from '@/Services/Axios';
 import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 const AdminDashboard = () => {
   const [message, setMessage] = useState('');
@@ -38,6 +38,7 @@ const AdminDashboard = () => {
       });
       setStatus({ type: 'success', text: 'Banner created successfully!' });
       setMessage(''); setStartTime(''); setEndTime('');
+      toast.success("Banner created successfully.")
       setStartTime(new Date().toISOString().slice(0,16));            
       setEndTime(new Date(Date.now()+3600*1000).toISOString().slice(0,16)); 
 
@@ -51,14 +52,12 @@ const AdminDashboard = () => {
   console.log("user id", user?.userId);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen md:gap-80 justify-center items-center">
  
       <div className="w-64 flex-shrink-0">
         <AdminSidebar />
       </div>
-
-
-      <main className="flex-1 bg-gray-50 p-6">
+      <main className="flex-1  p-6 bg-gray-100 rounded-3xl">
         <h1 className="text-2xl font-bold text-blue-600 mb-6">Create Timed Banner</h1>
 
         <form
@@ -112,7 +111,7 @@ const AdminDashboard = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-medium py-2 rounded hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-black font-medium py-2 rounded hover:bg-blue-700 transition"
           >
             Create Banner
           </button>

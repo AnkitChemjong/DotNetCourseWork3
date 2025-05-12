@@ -90,6 +90,8 @@ const BookDetails = () => {
       const currentPrice = book.discount > 0 && new Date(book.discountEndDate) > new Date()
         ? book.price * (1 - book.discount / 100)
         : book.price;
+        console.log(book.discount > 0 && new Date(book.discountEndDate) > new Date())
+        console.log("price",currentPrice)
   
       const finalData = {
         totalItems: quantity,

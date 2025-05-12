@@ -4,10 +4,13 @@ import AdminSidebar from '@/Components/AdminSidebar';
 import axios from 'axios';
 import axiosService from '@/Services/Axios';
 import { toast } from 'sonner';
+import { useDispatch } from 'react-redux';
+import { getAllBook } from '@/Store/Slice/AllBookSlice';
 
 const UpdateBook = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch=useDispatch();
 
   const initialState = {
     bookId: 0,
@@ -86,6 +89,7 @@ const UpdateBook = () => {
       const res = await axiosService.put(`/api/book/update/${id}`, book);
       if (res.status === 204) {
         toast.success('Book updated successfully');
+        dispatch(getAllBook());
         navigate('/admin/managebook');
       }
     } catch (error) {

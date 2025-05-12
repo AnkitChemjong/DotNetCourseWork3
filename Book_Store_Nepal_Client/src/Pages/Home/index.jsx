@@ -20,7 +20,6 @@ const Home = () => {
   const {data:user}=userState;
   const [topFourBooks,setTopFourBooks]=useState([]);
   const [highestRatedBooks,setHighestRatedBooks]=useState([]);
-   console.log(allBook)
   useEffect(()=>{
     if(allBook?.length>0 && !loading){
       const allBooksCopy=[...allBook]||[];
@@ -234,7 +233,7 @@ const Home = () => {
   </div>
 </div>
             
-            {/* Price with discount */}
+            {/* Price with discount  */}
             <div className="mt-2">
               {book.discount > 0 && new Date(book.discountEndDate) > new Date() ? (
                 <>
@@ -287,8 +286,6 @@ const Home = () => {
         </div>
       </section>
       </div>
-     
-  
       <Footer/>
     </div>
 

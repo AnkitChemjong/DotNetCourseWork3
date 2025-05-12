@@ -68,7 +68,7 @@ const AllBooks = () => {
   };
 
   return (
-    <div className="flex min-h-screen overflow-hidden">
+    <div className="flex min-h-screen overflow-hidden justify-center items-center">
       <div className="hidden md:block w-64">
         <AdminSidebar />
       </div>

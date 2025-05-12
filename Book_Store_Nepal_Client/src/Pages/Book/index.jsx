@@ -210,7 +210,7 @@ const {data:marks}=markState;
   const handleAddToCart = async (data) => {
     try {
       // Calculate the actual price (considering discount if applicable)
-      const currentPrice = data.discount > 0
+      const currentPrice = data.discount > 0 && new Date(data.discountEndDate) > new Date()
         ? data.price * (1 - data.discount / 100)
         : data.price;
   
