@@ -47,10 +47,9 @@ const Cart = () => {
       const response=await axiosService.post(`/api/order/place-from-cart/${user?.userId}`);
       console.log("response",response);
       if(response?.status===200){
-        await clearAllCart();
+        toast.success(response?.data?.message);
         dispatch(getAllCart());
         dispatch(getAllBook());
-        toast.success(response?.data?.message);
       }
     }
     catch(error){
@@ -102,8 +101,6 @@ const Cart = () => {
     }
   }
 
-  
-
   return (
     <div className="min-h-screen flex flex-col">
       <UserNavbar/>
@@ -132,7 +129,7 @@ const Cart = () => {
                   <TableRow key={cart.cartId}>
                     <TableCell className="font-medium">{cart.cartId}</TableCell>
                     <TableCell>{cart.book.title}-{cart.totalItems}</TableCell>
-                    <TableCell>Rs {Number(cart.cartTotal)/Number(cart.totalItems) || cart.originalPrice}</TableCell>
+                    <TableCell>Rs {cart?.book?.price || cart.originalPrice}</TableCell>
                     <TableCell> {cart.discount} %</TableCell>
                     <TableCell>Rs {cart.discountedPrice||0}</TableCell>
                     <TableCell>Rs {cart.cartTotal.toFixed(2)}</TableCell>
