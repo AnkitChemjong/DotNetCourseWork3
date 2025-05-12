@@ -19,6 +19,17 @@ import { useDispatch } from 'react-redux';
 import { getAllBook } from '@/Store/Slice/AllBookSlice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { FiDollarSign } from 'react-icons/fi';
+
 
 const Cart = () => {
   const cartState = useSelector(state => state?.carts);
@@ -31,6 +42,7 @@ const Cart = () => {
   const [loading1,setLoading1]=useState(false);
   const [loading2,setLoading2]=useState(false);
   const navigate=useNavigate();
+  const [isCheckoutDialogOpen, setIsCheckoutDialogOpen] = useState(false);
   console.log(cartData)
 
   useEffect(()=>{
@@ -52,6 +64,7 @@ const Cart = () => {
         dispatch(getAllCart());
         dispatch(getAllBook());
         toast.success(response?.data?.message);
+        setIsCheckoutDialogOpen(false);
       }
     }
     catch(error){
@@ -151,16 +164,20 @@ const Cart = () => {
               </TableBody>
             </Table>
 
-            <div className="mt-6 flex justify-end space-x-4">
-                <p>Total:-{userCart?.reduce((acc,obj)=>acc+Number(obj?.cartTotal||0),0)}</p>
-              <Button disabled={loading2} onClick={clearAllCart} variant="outline" className="text-red-600">
-                <FiTrash2 className="mr-2 h-4 w-4" />
-                {loading2? "Loading...":"Clear Entire Cart"}
-              </Button>
-              <Button disabled={loading} className="text-black" onClick={handleOrder}>
-                <FiShoppingCart className="mr-2 h-4 w-4" />
-                {loading? "Loading...":"Checkout All Items"}
-              </Button>
+                 <div className="mt-6 flex justify-end items-center space-x-6">
+              <div className="text-lg font-semibold">
+                  <p>Total:{userCart?.reduce((acc,obj)=>acc+Number(obj?.cartTotal||0),0)}</p>
+              </div>
+              <div className="flex space-x-4">
+                <Button disabled={loading2} onClick={clearAllCart} variant="outline" className="text-red-600">
+                  <FiTrash2 className="mr-2 h-4 w-4" />
+                  {loading2? "Loading...":"Clear Entire Cart"}
+                </Button>
+                <Button disabled={loading} className="text-black" onClick={() => setIsCheckoutDialogOpen(true)}>
+                  <FiShoppingCart className="mr-2 h-4 w-4" />
+                  {loading? "Loading...":"Checkout All Items"}
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
@@ -175,6 +192,53 @@ const Cart = () => {
           </div>
         )}
       </div>
+
+
+
+        {/* Checkout Dialog with only Cash on Delivery */}
+      <Dialog open={isCheckoutDialogOpen} onOpenChange={setIsCheckoutDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirm Your Order</DialogTitle>
+            <DialogDescription>
+              You'll pay when you receive your items
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="flex items-center p-4 border rounded-lg bg-gray-50">
+              <FiDollarSign className="h-6 w-6 text-green-600 mr-3" />
+              <div>
+                <h3 className="font-medium">Cash on Delivery</h3>
+                <p className="text-sm text-gray-500">Pay when you receive your order</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="flex justify-between font-medium text-lg">
+                <span>Total Amount</span>
+                <span>Rs {userCart?.reduce((acc,obj)=>acc+Number(obj?.cartTotal||0),0)}</span>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsCheckoutDialogOpen(false)}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleOrder} 
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Confirm Order"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Footer/>
     </div>
