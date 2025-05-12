@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import AdminSidebar from '@/Components/AdminSidebar';
-import axios from 'axios';
 import axiosService from '@/Services/Axios';
 import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 const AdminDashboard = () => {
   const [message, setMessage] = useState('');
@@ -38,6 +38,7 @@ const AdminDashboard = () => {
       });
       setStatus({ type: 'success', text: 'Banner created successfully!' });
       setMessage(''); setStartTime(''); setEndTime('');
+      toast.success("Banner created successfully.")
       setStartTime(new Date().toISOString().slice(0,16));            
       setEndTime(new Date(Date.now()+3600*1000).toISOString().slice(0,16)); 
 
@@ -110,7 +111,7 @@ const AdminDashboard = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-medium py-2 rounded hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-black font-medium py-2 rounded hover:bg-blue-700 transition"
           >
             Create Banner
           </button>
