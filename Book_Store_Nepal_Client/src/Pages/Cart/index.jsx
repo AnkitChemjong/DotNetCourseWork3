@@ -220,6 +220,7 @@ const Cart = () => {
 
           <DialogFooter>
             <Button 
+            className="text-black"
               variant="outline" 
               onClick={() => setIsCheckoutDialogOpen(false)}
               disabled={loading}
@@ -227,6 +228,7 @@ const Cart = () => {
               Cancel
             </Button>
             <Button 
+            className="text-black"
               onClick={handleOrder} 
               disabled={loading}
             >
