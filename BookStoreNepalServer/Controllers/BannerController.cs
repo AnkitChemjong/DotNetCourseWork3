@@ -45,9 +45,24 @@ namespace BookStoreNepalServer.Controllers
             return BadRequest(ModelState);
         }
 
-       
 
+        var now = DateTime.UtcNow;
+    var actives = await _db.BannerAnnouncement
+        .Where(b => b.StartTime <= now && b.EndTime >= now)
+        .ToListAsync();
 
+    // 2) “Close them out” immediately before adding the new one
+    foreach (var old in actives)
+    {
+        // either set EndTime to just before new banner starts:
+        old.EndTime = model.StartTime <= now
+            ? now.AddSeconds(-1)
+            : model.StartTime.AddSeconds(-1);
+
+        // … or you could have an `old.IsActive = false;` flag instead
+        _db.BannerAnnouncement.Update(old);
+    }
+    
         _db.BannerAnnouncement.Add(model);
         await _db.SaveChangesAsync();
 
