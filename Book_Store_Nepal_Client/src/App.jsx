@@ -23,6 +23,7 @@ import UpdateBook from './Pages/UpdateBook';
 import StaffDashboard from './Pages/StaffDashboard';
 import StaffOrderList from './Pages/StaffOrderList';
 import { getAllReview } from './Store/Slice/AllReviewSlice';
+import NotFound from './Pages/NotFound';
 
 
 function AdminRoute({ children }) {
@@ -87,6 +88,19 @@ const AuthRoute=({children})=>{
   }
   return !loading && logedUser? <Navigate to="/"/>:children;
 }
+function HomeRestrictForAdmin({children}){
+  const userStates = useSelector(state => state?.user);
+  const { data: user, loading } = userStates;
+  if (loading) {
+    return <CommonSkeleton />; 
+  }
+  if(!loading && user?.role==="admin"){
+    return <Navigate to="/admin/dashboard" />
+  }
+  else{
+    return children;
+  }
+}
 function App() {
   const userState=useSelector(state=>state?.user);
   const bookStates = useSelector(state => state?.books);
@@ -115,20 +129,6 @@ if(!reviewStates?.data){
   dispatch(getAllReview());
 }
   },[]);
-  function HomeRestrictForAdmin({children}){
-    const userStates = useSelector(state => state?.user);
-    const { data: user, loading } = userStates;
-    if (loading) {
-      return <CommonSkeleton />; 
-    }
-    if(!loading && user?.role==="admin"){
-      return <Navigate to="/admin/dashboard" />
-    }
-    else{
-      return children;
-    }
-  }
- 
   return (
     <Router>
       <Routes>
@@ -146,8 +146,8 @@ if(!reviewStates?.data){
         <Route path='/admin/addbook' element={<AdminRoute><AddBook/></AdminRoute>}/>
         <Route path='/admin/managebook' element={<AdminRoute><AllBooks/></AdminRoute>}/>
         <Route path='/admin/updatebook/:id' element={<AdminRoute><UpdateBook/></AdminRoute>}/>
+        <Route path='*' element={<NotFound/>}/>
       </Routes>
-      
     </Router>
   )
 }

@@ -13,7 +13,6 @@ namespace BookStoreNepalServer.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
-
         private readonly DB _db;
         private readonly EmailService _emailService;
         private readonly NotificationService _notificationService;
