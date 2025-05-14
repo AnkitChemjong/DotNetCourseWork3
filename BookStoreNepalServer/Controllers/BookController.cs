@@ -8,11 +8,13 @@ using BookStoreNepalServer.DTO;
 
 namespace BookStoreNepalServer.Controllers
 {
+    // Define route for book-related API actions
     [Route("api/book")]
     [ApiController]
     public class BookController : ControllerBase
     {
         private readonly DB _db;
+         // Constructor to inject the DB context for accessing database
 
         public BookController(DB db)
         {
@@ -20,30 +22,32 @@ namespace BookStoreNepalServer.Controllers
         }
 
 
-
+         // Endpoint to create a new book
         [HttpPost("create")]
         public async Task<IActionResult> CreateBook([FromBody] Books book)
         {
-
+              // Ensure that the model is valid
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+            // Check if a book with the same ISBN already exists
    
             if (await _db.Books.AnyAsync(b => b.ISBN == book.ISBN))
             {
                 return Conflict("A book with this ISBN already exists.");
             }
 
-
+           // Add the new book to the database
             await _db.Books.AddAsync(book);
             await _db.SaveChangesAsync();
 
-  
+           // If the BookId is still 0, there was an issue during book creation
             if (book.BookId == 0)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Failed to retrieve generated BookId");
             }
+            // Return a successful creation response
          var response=new {
             message="Book Created Successfully.",
             book=book
@@ -52,35 +56,41 @@ namespace BookStoreNepalServer.Controllers
             return CreatedAtAction(nameof(GetBook), new { id = book.BookId}, response);
         }
 
-    
+      // Endpoint to get a book by its ID
         [HttpGet("{id}")]
         public async Task<ActionResult<Books>> GetBook(int id)
         {
+            // Fetch the book from the database
             var book = await _db.Books.FindAsync(id);
+            // If the book is not found, return NotFound status
             if (book == null)
             {
                 return NotFound();
             }
+            // Return the book details if found
             return book;
         }
+        // Endpoint to get all books
 
         [HttpGet("getAllBooks")]
 public async Task<ActionResult<IEnumerable<Books>>> GetAllBooks()
 {
+    // Fetch all books with related reviews included
     var books = await _db.Books
     .Include(b => b.Reviews)
     .ToListAsync();
+    // If no books found, return NoContent
     if (books == null || books.Count == 0)
     {
         return NoContent(); 
     }
-
+// Return the list of books
     return Ok(books); 
 }
 
 
 
-
+// Endpoint to get books by category
          [HttpGet("categories/{category}")]
         public async Task<ActionResult> GetBooksByCategory(string category)
         {

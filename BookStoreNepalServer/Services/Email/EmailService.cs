@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 using MailKit.Net.Smtp;
 using MimeKit;
 namespace BookStoreNepalServer.Services.Email;
-
+//service that sends the email
 public class EmailService
 {
     private readonly SmtpSettings _smtpSettings;

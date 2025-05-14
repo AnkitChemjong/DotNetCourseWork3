@@ -1,7 +1,7 @@
 using System;
 
 namespace BookStoreNepalServer.Services.Email;
-
+//smtp setting for email service
 public class SmtpSettings
 {
     public string Host { get; set; }

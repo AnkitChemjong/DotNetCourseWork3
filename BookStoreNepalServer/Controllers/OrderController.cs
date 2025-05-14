@@ -16,7 +16,7 @@ namespace BookStoreNepalServer.Controllers
         private readonly DB _db;
         private readonly EmailService _emailService;
         private readonly NotificationService _notificationService;
-
+// Constructor to inject the DB context, email service, and notification service
 public OrderController(DB db, EmailService emailService,NotificationService notificationService)
 {
     _db = db;
@@ -26,35 +26,37 @@ public OrderController(DB db, EmailService emailService,NotificationService noti
 
 
 
-
+// Endpoint to place an order from the user's cart
    [HttpPost("place-from-cart/{userId}")]
 public async Task<IActionResult> PlaceOrderFromCart(int userId)
 {
+    //  Check if the user exists
     var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId);
     if (user == null)
         return NotFound("User not found");
-
+// Fetch the user's cart items
     var cartItems = await _db.Carts
-        .Include(c => c.Book)
+        .Include(c => c.Book) // Include book details in the cart item
         .Where(c => c.UserId == userId)
-        .ToListAsync();
+        .ToListAsync();// Get all cart items for this user
 
+// If there are no items in the cart, return a 400 BadRequest
     if (cartItems == null || !cartItems.Any())
         return BadRequest("No items in cart.");
 
-    // a) Create order items from cart, using DiscountedPrice
+    // Create order items from cart, using DiscountedPrice
     var orderItems = cartItems.Select(ci => new OrderItem {
         BookId    = ci.BookId,
         Quantity  = ci.TotalItems,
         UnitPrice = ci.DiscountedPrice // ✅ use discounted price from cart
     }).ToList();
 
-    // b) Calculate initial (original) and total prices
+    //  Calculate initial (original) and total prices
     decimal initialPrice = cartItems.Sum(ci => ci.Book.Price * ci.TotalItems);     // original total
     decimal totalPrice   = cartItems.Sum(ci => ci.DiscountedPrice * ci.TotalItems); // after per-book discounts
     int totalBooks       = cartItems.Sum(ci => ci.TotalItems);
 
-    // c) Calculate additional discount percent
+    // Calculate additional discount percent
     decimal discountPct = 0m;
     if (totalBooks >= 5)
         discountPct += 5m;
@@ -67,11 +69,11 @@ public async Task<IActionResult> PlaceOrderFromCart(int userId)
     if (user.Role == "staff")
         discountPct += 10m;
 
-    // d) Apply additional discount to total
+    //  Apply additional discount to total
     decimal discountAmt = totalPrice * discountPct / 100m;
     decimal finalPrice  = totalPrice - discountAmt;
 
-    // e) Create order
+    //  Create order
     var order = new Orders {
         UserId          = userId,
         TotalPrice      = finalPrice,
@@ -216,7 +218,7 @@ public async Task<IActionResult> PlaceOrderFromCart(int userId)
 
             return Ok("Order canceled successfully.");
         }
-
+// controller for getting all orders
       [HttpGet("getAllOrders")]
 public async Task<ActionResult<IEnumerable<Orders>>> GetAllOrders()
 {
@@ -235,6 +237,7 @@ public async Task<ActionResult<IEnumerable<Orders>>> GetAllOrders()
     return Ok(orders);
 }
 
+//controller for verifying the order claim code
 [HttpPost("verify/{userId}/{orderId}/{code}")]
 public async Task<ActionResult> CheckClaimCode(
     [FromRoute] int userId,
@@ -312,6 +315,7 @@ public async Task<ActionResult> CheckClaimCode(
     }
 }
 
+//method for sending mail
 private string GenerateInvoiceEmail(Users user, Orders order)
 {
     var itemsHtml = new StringBuilder();

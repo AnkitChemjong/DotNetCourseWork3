@@ -20,6 +20,8 @@ const Home = () => {
   const {data:user}=userState;
   const [topFourBooks,setTopFourBooks]=useState([]);
   const [highestRatedBooks,setHighestRatedBooks]=useState([]);
+
+  
   useEffect(()=>{
     if(allBook?.length>0 && !loading){
       const allBooksCopy=[...allBook]||[];

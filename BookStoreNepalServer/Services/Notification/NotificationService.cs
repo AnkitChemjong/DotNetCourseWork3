@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using BookStoreNepalServer.Hubs;
 using BookStoreNepalServer.Models;
 using BookStoreNepalServer.Database;
-
+// notification service 
 namespace BookStoreNepalServer.Services.Notification
 {
     public class NotificationService
@@ -24,7 +24,7 @@ namespace BookStoreNepalServer.Services.Notification
             _context = context;
             _logger = logger;
         }
-
+//This method sends the order placed notification in the frontend 
        public async Task SendOrderPlacedNotificationAsync(int userId, int orderId)
 {
     try
